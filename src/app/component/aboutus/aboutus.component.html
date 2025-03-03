@@ -1,0 +1,26 @@
+<body style="background-color: #F6F4F3;" class="p-2">
+    <div class="container my-2" >
+    
+        <div class="text-center mb-3">
+            <h1 class="fw-bold">We are the people who <br> made the project</h1>
+        </div>
+    
+    
+        <div class="row g-4">
+            <div class="d-flex flex-wrap justify-content-center gap-3 ">
+                <div class="col-md-4 col-lg-3" *ngFor="let member of images">
+                    <div class="  text-center ">
+                        <div class="image-container ">
+                            <img  [src]="member.image" [alt]="member.name" class="card-img-top rounded-top-4" />
+                        </div>
+                        <div class=" d-flex flex-column  justify-content-start align-items-start p-3  card-body customColor rounded-bottom-4">
+                            <h5 class="card-title fw-bold">{{ member.name }}</h5>
+                            <p class="card-text">{{ member.role }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+</body>

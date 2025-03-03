@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "john_doe",
+      "email": "john.doe@example.com",
+      "password": "password123",
+      "role": "Student"
+    },
+    {
+      "id": "eaed",
+      "username": "peter",
+      "email": "peterrafat@gmail.com",
+      "password": "12345678",
+      "role": "Teacher"
+    },
+    {
+      "id": "2e88",
+      "username": "peter",
+      "email": "sadasdas@gmail.com",
+      "password": "123456789",
+      "role": "Student"
+    },
+    {
+      "id": "6783",
+      "username": "raze",
+      "email": "raze@gmail.com",
+      "password": "66666666",
+      "role": "Teacher"
+    },
+    {
+      "id": "8ddd",
+      "email": "sage@email.com",
+      "password": "P@ss12345",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": "dd46",
+      "email": "sage@email.com",
+      "password": "P@ss12345",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": "07bf",
+      "email": "sage@email.com",
+      "password": "222222222",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": "2e7e",
+      "email": "sage@email.com",
+      "password": "11111111",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": "678c",
+      "email": "sage@email.com",
+      "password": "22222222",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": "55",
+      "email": "sage@email.com",
+      "password": "11111111",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": null,
+      "email": "sage@email.com",
+      "password": "22222222",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    },
+    {
+      "id": " ",
+      "email": "sage@email.com",
+      "password": "P@ss12345",
+      "firstName": "sage",
+      "lastName": "Elsaid"
+    }
+  ]
+}

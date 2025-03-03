@@ -1,0 +1,25 @@
+*{
+    font-family: Roboto;
+}
+/* nav{
+    position: fixed;
+    z-index: 1000;
+} */
+nav .container-fluid{
+    background: #F6F4F3;
+    padding: 5px;
+    position: sticky;
+}
+button.btn{
+    background: #150578;
+    margin: 2px;
+    border-radius: 5px;
+}
+button.btn:hover{
+    background: white;
+    color: #276FBF;
+}
+img{
+    width: 35px;
+    margin-left: 5px;
+}

@@ -1,0 +1,16 @@
+.backgroundSite{
+    color: #F6F4F3;
+}
+.boldBlue{
+    color: #150578;
+}
+.semiBlue{
+    color: #276FBF;
+}
+button.btn{
+    background: #150578;
+}
+button.btn:hover{
+    background: white;
+    color: #276FBF;
+}

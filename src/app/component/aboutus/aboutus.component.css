@@ -1,0 +1,28 @@
+/* .container{
+ width: 100%;
+} */
+.customColor{
+    background-color: #276FBF;
+}
+.image-container {
+    width: 100%; 
+    height: 300px; 
+    overflow: hidden; 
+}
+.image-container img {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover; 
+}
+.card {
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+}
+
+h1{
+    color: #276FBF;
+}
+h5,p{
+    color: white;
+}
