@@ -5,6 +5,10 @@ import { HomeComponent } from './component/home/home.component';
 import { AboutusComponent } from './component/aboutus/aboutus.component';
 
 export const routes: Routes = [
+    {
+        path: 'Student',
+        loadChildren: () => import('./student/student.routes').then(m => m.studentRoutes)
+    },
     {path:'',redirectTo:"home",pathMatch:'full'},
     {path:"home" , component:HomeComponent},
     {path:"login" , component:LoginComponent},
