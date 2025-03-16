@@ -3,6 +3,9 @@ import { LoginComponent } from './component/login/login.component';
 import { RegisterComponent } from './component/register/register.component';
 import { HomeComponent } from './component/home/home.component';
 import { AboutusComponent } from './component/aboutus/aboutus.component';
+import { QuizManuallyComponent } from './teacher/quiz-manually/quiz-manually.component';
+import { RoomsComponent } from './teacher/rooms/rooms.component';
+import { OpenquizComponent } from './teacher/openquiz/openquiz.component';
 
 export const routes: Routes = [
     {
@@ -14,4 +17,7 @@ export const routes: Routes = [
     {path:"login" , component:LoginComponent},
     {path:"register" ,component:RegisterComponent},
     {path:"aboutus" , component:AboutusComponent},
+    {path:"quizManually" , component:QuizManuallyComponent},
+    {path:"rooms" , component:RoomsComponent},
+    {path:"openquiz" , component:OpenquizComponent},
 ];
