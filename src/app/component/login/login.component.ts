@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms'; // Import FormsModule and NgForm
+import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule], // Import FormsModule for template-driven forms
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -23,7 +23,7 @@ export class LoginComponent {
         password: form.value.password
       };
 
-      // Send a get request to the mock API to check login credentials
+
       this.http.get<any[]>('http://quizgenerator.runasp.net/Auth/login')
         .subscribe({
           next: (users: any[]) => {

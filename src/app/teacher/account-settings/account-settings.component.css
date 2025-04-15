@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inria+Sans:wght@400;700&display=swap');
+
+p {
+  font-family: 'Inria Sans', sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+}
+button.btn{
+  background: #332588;
+}
