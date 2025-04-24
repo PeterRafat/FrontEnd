@@ -19,7 +19,7 @@ export class AccountSettingsComponent {
   };
 
   onSubmit(form: NgForm) {
-    // نعلم إن المستخدم حاول يقدّم الفورم علشان الرسائل تظهر
+    
     form.form.markAllAsTouched();
 
     if (form.valid && this.formData.password === this.formData.confirmPassword) {
