@@ -1,0 +1,97 @@
+<div class="container mt-5">
+    <h2>Quiz Details</h2>
+    <form #quizForm="ngForm" (ngSubmit)="onSubmit(quizForm)">
+        <!-- Quiz Name -->
+        <div class="mb-3">
+            <label for="quizName" class="form-label">Quiz Name</label>
+            <input type="text" class="form-control" id="quizName" name="quizName" [(ngModel)]="quiz.quizName" required
+                #quizName="ngModel">
+            <div *ngIf="quizName.invalid && (quizName.dirty || quizName.touched)" class="text-danger">
+                <div *ngIf="quizName.errors?.['required']">Quiz Name is required.</div>
+            </div>
+        </div>
+
+        <!-- Start and End Time -->
+        <div class="row mb-3">
+            <div class="col">
+                <label for="startTime" class="form-label">Start Time</label>
+                <input type="time" class="form-control" id="startTime" name="startTime" [(ngModel)]="quiz.startTime"
+                    required #startTime="ngModel">
+                <div *ngIf="startTime.invalid && (startTime.dirty || startTime.touched)" class="text-danger">
+                    <div *ngIf="startTime.errors?.['required']">Start Time is required.</div>
+                </div>
+            </div>
+            <div class="col">
+                <label for="endTime" class="form-label">End Time</label>
+                <input type="time" class="form-control" id="endTime" name="endTime" [(ngModel)]="quiz.endTime" required
+                    #endTime="ngModel">
+                <div *ngIf="endTime.invalid && (endTime.dirty || endTime.touched)" class="text-danger">
+                    <div *ngIf="endTime.errors?.['required']">End Time is required.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Difficulty Level -->
+        <div class="mb-3">
+            <label for="difficultyLevel" class="form-label">Difficulty Level</label>
+            <select class="form-select" id="difficultyLevel" name="difficultyLevel" [(ngModel)]="quiz.difficultyLevel"
+                required #difficultyLevel="ngModel">
+                <option value="">Select Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <div *ngIf="difficultyLevel.invalid && (difficultyLevel.dirty || difficultyLevel.touched)"
+                class="text-danger">
+                <div *ngIf="difficultyLevel.errors?.['required']">Difficulty Level is required.</div>
+            </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration" [(ngModel)]="quiz.duration" required
+                min="1" #duration="ngModel">
+            <div *ngIf="duration.invalid && (duration.dirty || duration.touched)" class="text-danger">
+                <div *ngIf="duration.errors?.['required']">Duration is required.</div>
+                <div *ngIf="duration.errors?.['min']">Duration must be at least 1 minute.</div>
+            </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <h3 class="mt-5">Upload Files</h3>
+        <div class="mb-3">
+            <label class="form-label">Upload PDF files to share with your team members</label>
+            <div class="upload-area border rounded p-3 text-center position-relative" (dragover)="onDragOver($event)"
+                (drop)="onDrop($event)">
+                <input type="file" id="fileUpload" multiple accept="application/pdf" class="d-none"
+                    (change)="onFileSelected($event)">
+
+                <div *ngIf="previewFiles.length === 0" class="py-5">
+                    <i class="bi bi-cloud-arrow-up fs-2"></i>
+                    <p class="mt-2 mb-0">Drag & Drop PDF files here or</p>
+                    <label for="fileUpload" class="btn btn-primary mt-2">Choose files</label>
+                </div>
+
+                <div *ngIf="previewFiles.length > 0" class="mt-3">
+                    <div class="row">
+                        <div class="col-md-3 mb-3" *ngFor="let file of previewFiles; let i = index">
+                            <div class="card">
+                                <img [src]="file.url" class="card-img-top" alt="PDF Preview"
+                                    style="height: 100px; object-fit: contain;">
+                                <div class="card-body">
+                                    <p class="card-text">{{ file.name }}</p>
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="removeFile(i)">
+                                        <i class="bi bi-x"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <label for="fileUpload" class="btn btn-outline-primary">Add more files</label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary generate" [disabled]="quizForm.invalid">Generate</button>
+    </form>
+</div>

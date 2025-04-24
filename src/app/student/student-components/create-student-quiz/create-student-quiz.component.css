@@ -1,0 +1,25 @@
+/* add-product.component.css */
+.upload-area {
+    min-height: 150px;
+    border: 2px dashed #dee2e6 !important;
+    background-color: #f8f9fa;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  
+  .upload-area:hover, .upload-area.dragover {
+    border-color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  
+  .img-thumbnail {
+    height: 150px;
+    object-fit: cover;
+  }
+  .generate{
+    float: right;
+    margin-bottom: 1rem;
+    width: 10rem;
+    height: 3rem;
+    text-align: center;
+  }

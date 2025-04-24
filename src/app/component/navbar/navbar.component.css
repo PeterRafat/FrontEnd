@@ -23,3 +23,8 @@ img{
     width: 35px;
     margin-left: 5px;
 }
+/* Add this to your component's CSS file or global styles */
+.logo-container {
+    width: 40px; /* Equivalent to w-10 in Tailwind */
+    height: 40px; /* Equivalent to h-10 in Tailwind */
+  }

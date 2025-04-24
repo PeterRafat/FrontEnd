@@ -1,0 +1,22 @@
+<div class="container ">
+    <h2  style="color: #332588;">{{ subjectName }}</h2>
+    <div class="card p-3 mb-4">
+        <div class="d-grid" style="grid-template-columns: auto auto auto auto; gap: 10px; align-items: center;">
+            <span class="fw-bold" style="color: #332588;">ID:</span> <span>{{ userId }}</span>
+            <span class="fw-bold" style="color: #332588;">Password:</span> <span>{{ password }}</span>
+        </div>
+    </div>    
+    <div class="card p-3 mt-3" *ngFor="let quiz of quizzes">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="fw-bold" style="color: #332588;">{{ quiz.name }}</h5>
+          <p style="color: #332588;">Start: {{ quiz.start }} to: {{ quiz.end }}</p>
+          <p style="color: #332588;">Status: <span >{{ quiz.status }}</span></p>
+        </div>
+        <button class="btn" style="background-color: #332588;color: white;">Open</button>
+      </div>
+    </div>
+    <div class="text-end mt-2">
+      <button class="btn" style="background-color: #332588;color: white;">Create Quiz</button>
+    </div>
+  </div>
