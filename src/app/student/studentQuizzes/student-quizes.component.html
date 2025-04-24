@@ -1,5 +1,5 @@
 <div class="container py-4">
-    <h3 class="text-start mb-4 fw-bold" style="color: #332588;">Rooms</h3>
+    <h3 class="text-start mb-4 fw-bold" style="color: #332588;">Quizzes</h3>
 
     <div class="quiz-list">
         <div *ngFor="let room of rooms" class="quiz-item d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm mb-3">
@@ -8,53 +8,28 @@
                 <p style="color: #332588;" class="mb-1">Open: {{ room.opendate }}</p>
                 <p style="color: #332588;">Close: {{ room.closedate }}</p>
             </div>
-            <div class="quiz-actions">
-                <button (click)="openQuiz(room.id)" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">Open</button>
-                <button (click)="leaveQuiz(room.id)" class="btn btn-light fw-bold " style="background-color:#F1F5FF ;color: #332588;">Leave</button>
+
+            <!-- Network section (أول سكشن) -->
+            <div *ngIf="room.name === 'Network'" class="quiz-actions d-flex flex-column align-items-center gap-2">
+                <button class="btn btn-primary fw-bold" style="background-color: #332588; color: white;">Done</button>
+                <span class="btn btn-primary fw-bold" style="background-color: #276FBF; color: #FFFFFF;">8/10</span>
+            </div>
+
+            <div *ngIf="room.name === 'Math'" class="quiz-actions d-flex flex-column align-items-center gap-2">
+                <button (click)="goToAttempt(room.id)" class="btn btn-primary fw-bold" style="background-color: #332588; color: white;">Attempt</button>
+            </div>
+
+            <div *ngIf="room.name === 'English'" class="quiz-actions d-flex flex-column align-items-center gap-2">
+                <button (click)="goToContinue(room.id)" class="btn btn-primary fw-bold" style="background-color: #332588; color: white;">Continue</button>
             </div>
         </div>
     </div>
 
     <div class="d-flex mt-5">
         <div class="ms-auto">
-            <button class="btn btn-primary fw-bold me-4 w-100" data-bs-toggle="modal" data-bs-target="#createRoomModal" style="background-color: #332588;color: white;">Join</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="createRoomModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-4">
-            <div class="modal-header border-0 justify-content-center">
-                <h5 class="modal-title text-center w-100 fw-bold" style="color: #332588;">Room</h5>
-                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
-                    <div class="d-flex align-items-center gap-2 mb-4">
-                        <label for="subject" class="fw-bold w-25 text-start" style="color: #332588;">ID</label>
-                        <input type="text" id="ID" name="ID" class="form-control w-50" [(ngModel)]="formdata.ID" #subject="ngModel" required>
-                        <span class="text-danger" *ngIf="submit && subject.errors?.['required']">
-              ID is required.
-            </span>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-2 mb-4">
-                        <label for="password" class="fw-bold w-25 text-start" style="color: #332588;">Password</label>
-                        <input type="password" id="password" name="password" class="form-control w-50" [(ngModel)]="formdata.password" #password="ngModel" required>
-                        <span class="text-danger" *ngIf="submit && subject.errors?.['required']">
-              Password is required.
-            </span>
-                    </div>
-
-                    <div class="d-flex justify-content-center mt-4">
-                        <button type="submit" class="btn btn-primary w-40 fw-bold" style="background-color: #332588;color: white;" [disabled]="loading">
-            <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
-            Join Room
-          </button>
-                    </div>
-                </form>
-            </div>
+            <button (click)="goHome()" class="btn btn-primary fw-bold me-4 w-100" style="background-color: #332588;color: white;">
+        Exit
+      </button>
         </div>
     </div>
 </div>

@@ -5,6 +5,7 @@ import { HomeComponent } from './component/home/home.component';
 import { AboutusComponent } from './component/aboutus/aboutus.component';
 import { AccountSettingsComponent } from './teacher/account-settings/account-settings.component';
 import { StudentRoomComponent } from './student/studentRoom/student-room.component';
+import { StudentQuizesComponent } from './student/studentQuizzes/student-quizes.component';
 
 export const routes: Routes = [
     {path:'',redirectTo:"home",pathMatch:'full'},
@@ -15,4 +16,6 @@ export const routes: Routes = [
     {path:"account",component:AccountSettingsComponent},
     {path:"studentAccount",component:AccountSettingsComponent},
     {path:"studentRoom",component:StudentRoomComponent},
+    { path: "studentQuizes", component: StudentQuizesComponent }
+
 ];
