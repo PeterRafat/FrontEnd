@@ -1,7 +1,7 @@
 <div class="quiz-container ">
     <h2 class="text-center fw-bold mb-4" style="color: #332588;">Quiz Details</h2>
   
-    <form [formGroup]="quizForm">
+    <form [formGroup]="quizForm" (ngSubmit)="saveQuiz()">
         <div class="row mb-3 justify-content-center ">
             <div class="col-md-3">
                 <label class="form-label fw-bold" style="color: #332588;">Quiz Name:</label>
@@ -33,31 +33,36 @@
         <div formArrayName="questions">
           <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="question-box">
             
+            <label>Q{{ i + 1 }}</label>
             <input type="text" formControlName="questionText" style="width: 400px; ">
-  
-            
+        
             <div formArrayName="options">
               <div *ngFor="let option of getOptions(question).controls; let j = index" 
                    [formGroupName]="j" class="option-box">
                 
+                <label>{{ getLetter(j) }}.</label>
                 <input type="text" formControlName="text">
                 <input type="checkbox" formControlName="isCorrect"> 
               </div>
             </div>
+        
             <div class="button-group">
-            <button type="button" (click)="editQuestion(i)" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">
-              {{ editingQuestionIndex === i ? ' Done' : ' Edit' }}
-            </button>
-            <button type="button" (click)="deleteQuestion(i)" class="btn  fw-bold " style="background-color:#F1F5FF ;color: #332588;"> Delete</button>
+              <button type="button" (click)="editQuestion(i)" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">
+                {{ editingQuestionIndex === i ? ' Done' : ' Edit' }}
+              </button>
+              <button type="button" (click)="deleteQuestion(i)" class="btn fw-bold" style="background-color:#F1F5FF ;color: #332588;"> Delete</button>
             </div>
           </div>
         </div>
+        
         <button type="button" (click)="addQuestion()" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">Add Question</button>
           
         <div class="button-group">
           <button type="submit" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;"> Save Quiz</button>
           <button type="button" (click)="exitQuiz()" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;"> Exit</button>
         </div>
+        
+        
         
       </form>
     </div>

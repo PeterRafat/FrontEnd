@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import {  Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-rooms',
@@ -23,9 +24,10 @@ export class RoomsComponent {
     { id: 3, name: 'Subject', date: '15 Oct 2024' }
   ];
 
-  openQuiz(id: number) {
-    console.log(`Opening quiz with ID: ${id}`);
+  goToOpenQuiz(): void {
+    this.router.navigate(['/openquiz']);
   }
+  
 
   deleteQuiz(id: number) {
     this.rooms = this.rooms.filter(room => room.id !== id);
@@ -36,46 +38,45 @@ export class RoomsComponent {
     console.log('Creating a new room...');
   }
 
-  close() {
-    console.log('Closing...');
+  close() : void {
+    this.router.navigate(['/quizManually']);
+  
   }
 
-  onSubmit(f: NgForm): void {
-      this.submit = true;
+  onSubmit(form: NgForm) {
+    if (form.valid) {
+      const room = {
+        subject: form.value.subject,
+        password: form.value.password
+      };
   
-      if (f.valid) {
-        this.loading = true;
+      console.log(room);
   
-        const payload = {
-          email: this.formdata.subject,
-          password: this.formdata.password,
-        };
-  
-        
-        this.http.post('data/login.json', payload).subscribe(
-          (response) => {
-            console.log('Login successful:', response);
-            this.loading = false;
-  
-            
-            this.formdata = { subject: '', password: '' };
-            f.resetForm(); 
-            alert('create room successful!');
-  
-            
-            this.router.navigate(['/home']).then(() => {
-              console.log('Navigated to /createquiz');
-            });
-            
-          },
-          (error) => {
-            console.error('Login error:', error);
-            this.errorMessage = 'Invalid subject or password.';
-            this.loading = false;
-          }
-        );
-      } else {
-        this.errorMessage = 'Please fill out the form correctly.';
-      }
+      this.http.post('http://quizgenerator.runasp.net/Room/create', room).subscribe({
+        next: (response: any) => {
+          Swal.fire({
+            title: 'Room created!',
+            text: 'Your room has been created successfully.',
+            icon: 'success',
+          });
+          this.router.navigateByUrl('/rooms'); 
+        },
+        error: (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Room creation failed',
+            text: error.error.message || 'Something went wrong.',
+            footer: '<a href="#">Why do I have this issue?</a>',
+          });
+        },
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Form',
+        text: 'Please fill out all required fields correctly.',
+      });
     }
+  }
+  
 }
