@@ -5,103 +5,115 @@
                 <div class="card text-black" style="border-radius: 25px;">
                     <div class="card-body p-md-5">
                         <div class="row justify-content-center">
-                            <!-- Image Column (Left) -->
+
+                            <!-- Image Column -->
                             <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-1">
                                 <img src="/photo/pic.png" class="img-fluid" alt="Sample image" />
                             </div>
 
-                            <!-- Form Column (Right) -->
+                            <!-- Form Column -->
                             <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-2">
                                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
 
                                 <!-- Angular Form -->
                                 <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="mx-1 mx-md-4">
 
-                                    <!-- Username Field -->
+                                    <!-- First Name -->
                                     <div class="d-flex flex-column gap-2 mb-4">
                                         <div class="form-outline flex-fill mb-0">
-                                            <label class="form-label" for="username">First Name</label>
-                                            <input type="text" id="firstName" name="firstName" class="form-control" #fname="ngModel" ngModel required pattern="^[a-zA-Z]{3,15}$" placeholder="Enter your First Name" /> @if(fname.invalid && fname.touched)
-                                            {
-                                            <div class="text-danger">
-                                                @if(fname.errors?.['required']) {
-                                                <p>First Name is required</p>
-                                                } @if(fname.errors?.['pattern']) {
-                                                <p>First Name must be at least 3 characters</p>
-                                                }
+                                            <label class="form-label" for="firstName">First Name</label>
+                                            <input type="text" id="firstName" name="firstName" class="form-control"
+                                                #fname="ngModel" ngModel required pattern="^[a-zA-Z]{3,15}$"
+                                                placeholder="Enter your First Name" />
+                                            <div class="text-danger" *ngIf="fname.invalid && fname.touched">
+                                                <p *ngIf="fname.errors?.['required']">First Name is required</p>
+                                                <p *ngIf="fname.errors?.['pattern']">First Name must be at least 3
+                                                    characters</p>
                                             </div>
-                                            }
                                         </div>
-                                        <!-- Last Name Field -->
+
+                                        <!-- Last Name -->
                                         <div class="form-outline flex-fill mb-0">
-                                            <label class="form-label" for="username">Last Name</label>
-                                            <input type="text" id="lastName" name="lastName" class="form-control" #Lname="ngModel" ngModel required pattern="^[a-zA-Z]{3,15}$" placeholder="Enter your Last Name" /> @if(Lname.invalid && Lname.touched) {
-                                            <div class="text-danger">
-                                                @if(Lname.errors?.['required']) {
-                                                <p>Last Name is required</p>
-                                                } @if(Lname.errors?.['pattern']) {
-                                                <p>Last Name must be at least 3 characters</p>
-                                                }
+                                            <label class="form-label" for="lastName">Last Name</label>
+                                            <input type="text" id="lastName" name="lastName" class="form-control"
+                                                #Lname="ngModel" ngModel required pattern="^[a-zA-Z]{3,15}$"
+                                                placeholder="Enter your Last Name" />
+                                            <div class="text-danger" *ngIf="Lname.invalid && Lname.touched">
+                                                <p *ngIf="Lname.errors?.['required']">Last Name is required</p>
+                                                <p *ngIf="Lname.errors?.['pattern']">Last Name must be at least 3
+                                                    characters</p>
                                             </div>
-                                            }
                                         </div>
                                     </div>
 
-                                    <!-- Email Field -->
+                                    <!-- Grade Level (renamed to gradLevel) -->
+                                    <div class="form-outline flex-fill mb-0">
+                                        <label class="form-label" for="gradLevel">Grade level</label>
+                                        <input type="text" id="gradLevel" name="gradLevel" class="form-control"
+                                            #gradeLevel="ngModel" ngModel required pattern="^[a-zA-Z]{3,15}$"
+                                            placeholder="Enter your grade level" />
+                                        <div class="text-danger" *ngIf="gradeLevel.invalid && gradeLevel.touched">
+                                            <p *ngIf="gradeLevel.errors?.['required']">Grade level is required</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <div class="form-outline flex-fill mb-0">
                                             <label class="form-label" for="email">Your Email</label>
-                                            <input type="email" id="email" name="email" class="form-control" #uemail="ngModel" ngModel required email placeholder="Enter your email" /> @if(uemail.invalid && uemail.touched) {
-                                            <div class="text-danger">
-                                                @if(uemail.errors?.['required']){
-                                                <p>Email is required</p>
-                                                } @if(uemail.errors?.['email']){
-                                                <p>Email should be as example&#64;gmail.com</p>
-                                                }
+                                            <input type="email" id="email" name="email" class="form-control"
+                                                #uemail="ngModel" ngModel required email
+                                                placeholder="Enter your email" />
+                                            <div class="text-danger" *ngIf="uemail.invalid && uemail.touched">
+                                                <p *ngIf="uemail.errors?.['required']">Email is required</p>
+                                                <p *ngIf="uemail.errors?.['email']">Email should be like
+                                                    example&#64;email.com</p>
                                             </div>
-                                            }
                                         </div>
                                     </div>
 
-                                    <!-- Password Field -->
+                                    <!-- Password -->
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <div class="form-outline flex-fill mb-0">
                                             <label class="form-label" for="password">Password</label>
-                                            <input type="password" id="password" name="password" class="form-control" ngModel required minlength="8" #upassword="ngModel" placeholder="Enter your password" /> @if(upassword.invalid && upassword.touched)
-                                            {
-                                            <div class="text-danger">
-                                                @if(upassword.errors?.['required']) {
-                                                <p>password is required </p>
-                                                } @if(upassword.errors?.['minlength']) {
-                                                <p>password should be at least 8 characters </p>
-                                                }
+                                            <input type="password" id="password" name="password" class="form-control"
+                                                ngModel required minlength="8" #upassword="ngModel"
+                                                placeholder="Enter your password" />
+                                            <div class="text-danger" *ngIf="upassword.invalid && upassword.touched">
+                                                <p *ngIf="upassword.errors?.['required']">Password is required</p>
+                                                <p *ngIf="upassword.errors?.['minlength']">Password should be at least 8
+                                                    characters</p>
                                             </div>
-                                            }
                                         </div>
                                     </div>
 
-                                    <!-- Confirm Password Field -->
+                                    <!-- Confirm Password -->
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <div class="form-outline flex-fill mb-0">
                                             <label class="form-label" for="confirmPassword">Repeat your password</label>
-                                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" ngModel #upasswordConfirm="ngModel" required placeholder="Repeat your password" /> @if(upasswordConfirm.invalid && upasswordConfirm.touched)
-                                            {
-                                            <div class="text-danger">
-                                                @if(upasswordConfirm.errors?.['required']) {
-                                                <p>Repeat password is required </p>
-                                                }
+                                            <input type="password" id="confirmPassword" name="confirmPassword"
+                                                class="form-control" ngModel #upasswordConfirm="ngModel" required
+                                                placeholder="Repeat your password" />
+                                            <div class="text-danger"
+                                                *ngIf="upasswordConfirm.invalid && upasswordConfirm.touched">
+                                                <p *ngIf="upasswordConfirm.errors?.['required']">Repeat password is
+                                                    required</p>
                                             </div>
-                                            }
-                                            <div class="text-danger" *ngIf="upassword.value !== upasswordConfirm.value && upasswordConfirm.touched">Passwords are not equal</div>
+                                            <div class="text-danger"
+                                                *ngIf="upassword.value !== upasswordConfirm.value && upasswordConfirm.touched">
+                                                Passwords are not equal
+                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- Submit Button -->
-                                    <div class="">
-                                        <button type="submit" class="btn btn-primary btn-lg" [disabled]="registerForm.invalid || upassword.value !== upasswordConfirm.value">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary btn-lg"
+                                            [disabled]="registerForm.invalid || upassword.value !== upasswordConfirm.value">
                                             Register
                                         </button>
                                     </div>
+
                                 </form>
                             </div>
                         </div>
