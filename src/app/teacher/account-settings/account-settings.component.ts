@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   templateUrl: './account-settings.component.html',
   styleUrls: ['./account-settings.component.css'],
-  imports: [FormsModule, NgIf, NgFor]
+  imports: [FormsModule]
 })
 export class AccountSettingsComponent {
   constructor(private http: HttpClient, private router: Router) {}

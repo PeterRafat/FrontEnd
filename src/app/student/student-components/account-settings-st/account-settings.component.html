@@ -8,45 +8,50 @@
                             <h2 class="fw-bold" style="color: #364B96;">Account Setting</h2>
                         </div>
                         <div class="row align-items-center">
-                            <!-- Image Section -->
                             <div class="col-md-4 text-center">
-                                <img src="/photo/pic.png" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;" />
+                                <img src="" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;" />
                                 <div class="mt-2">
                                     <button class="btn change-btn" style="background-color: white; color: #332588; border: 1px solid #332588;">Change</button>
                                 </div>
                             </div>
-                            <!-- Form Section -->
+
                             <div class="col-md-8">
-                                <form>
+                                <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+
                                     <div class="mb-3">
                                         <label class="form-label" style="color: #332588;">Name</label>
-                                        <input type="text" class="form-control" style="width: 500px;" placeholder="Enter your name" required>
+                                        <input type="text" class="form-control" name="name" [(ngModel)]="formData.name" required>
+                                        <div class="text-danger" *ngIf="form.submitted && !formData.name">Name is required</div>
                                     </div>
+
                                     <div class="mb-3">
                                         <label class="form-label" style="color: #332588;">Email</label>
-                                        <input type="email" class="form-control" style="width: 500px;" placeholder="Enter your email" required>
+                                        <input type="email" class="form-control" name="email" [(ngModel)]="formData.email" required>
+                                        <div class="text-danger" *ngIf="form.submitted && !formData.email">Email is required</div>
                                     </div>
+
                                     <div class="mb-3">
                                         <label class="form-label" style="color: #332588;">Password</label>
-                                        <input type="password" class="form-control" style="width: 500px;" placeholder="Enter your password" required>
+                                        <input type="password" class="form-control" name="password" [(ngModel)]="formData.password" required>
+                                        <div class="text-danger" *ngIf="form.submitted && !formData.password">Password is required</div>
                                     </div>
+
                                     <div class="mb-3">
                                         <label class="form-label" style="color: #332588;">Confirm Password</label>
-                                        <input type="password" class="form-control" style="width: 500px;" placeholder="Enter your password" required>
+                                        <input type="password" class="form-control" name="confirmPassword" [(ngModel)]="formData.confirmPassword" required>
+                                        <div class="text-danger" *ngIf="form.submitted && !formData.confirmPassword">Confirm Password is required</div>
+                                        <div class="text-danger" *ngIf="form.submitted && formData.password !== formData.confirmPassword">Passwords do not match</div>
                                     </div>
+
                                     <button type="submit" class="btn btn-primary" style="width: 178px;">Save</button>
                                 </form>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <style>
-        .change-btn:hover {
-            background-color: #332588 !important;
-            color: white !important;
-        }
-    </style>
+
 </section>

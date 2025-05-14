@@ -6,7 +6,7 @@ import { CreateStudentQuizComponent } from "./student/student-components/create-
 
 @Component({
   selector: 'app-root',
-  imports: [NavbarComponent, RouterOutlet, CreateStudentQuizComponent],
+  imports: [NavbarComponent, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

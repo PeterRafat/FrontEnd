@@ -5,12 +5,12 @@ import { HomeComponent } from './component/home/home.component';
 import { AboutusComponent } from './component/aboutus/aboutus.component';
 
 import { AccountSettingsComponent } from './teacher/account-settings/account-settings.component';
-import { StudentRoomComponent } from './student/studentRoom/student-room.component';
-import { StudentQuizesComponent } from './student/studentQuizzes/student-quizes.component';
 
 import { QuizManuallyComponent } from './teacher/quiz-manually/quiz-manually.component';
 import { RoomsComponent } from './teacher/rooms/rooms.component';
 import { OpenquizComponent } from './teacher/openquiz/openquiz.component';
+import { StudentRoomComponent } from './student/student-components/studentRoom/student-room.component';
+import { StudentQuizesComponent } from './student/student-components/studentQuizzes/student-quizes.component';
 
 
 export const routes: Routes = [
@@ -27,7 +27,7 @@ export const routes: Routes = [
     {path:"account",component:AccountSettingsComponent},
     {path:"studentAccount",component:AccountSettingsComponent},
     {path:"studentRoom",component:StudentRoomComponent},
-    { path: "studentQuizes", component: StudentQuizesComponent },
+    { path: "studentQuizes", component:StudentQuizesComponent},
 
 
     {path:"quizManually" , component:QuizManuallyComponent},
