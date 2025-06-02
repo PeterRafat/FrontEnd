@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from "./component/navbar/navbar.component";
-import { RegisterComponent } from './component/register/register.component';
-import { CreateStudentQuizComponent } from "./student/student-components/create-student-quiz/create-student-quiz.component";
+import { DynamicNavbarComponent } from './component/dynamic-navbar/dynamic-navbar.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [NavbarComponent, RouterOutlet],
+  imports: [RouterOutlet,CommonModule,DynamicNavbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

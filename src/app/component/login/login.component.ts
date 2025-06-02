@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { CommonModule } from '@angular/common';
+import { AuthServiceService } from '../../service/auth-service.service';
 
 @Component({
   selector: 'app-login',
@@ -13,55 +13,53 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  constructor(private http: HttpClient, private router: Router) { }
+
+  constructor(
+    private authService: AuthServiceService,
+    private router: Router
+  ) {
+    
+  }
 
   onSubmit(form: NgForm) {
-    // Check if the form is valid
     if (form.valid) {
-      const loginData = {
-        email: form.value.email,
-        password: form.value.password
-      };
-
-
-      this.http.get<any[]>('http://quizgenerator.runasp.net/Auth/login')
-        .subscribe({
-          next: (users: any[]) => {
-            const user = users.find(u => u.email === loginData.email && u.password === loginData.password);
-            if (user) {
-              // Show success alert
-              Swal.fire({
-                title: "Login successful!",
-                text: "Welcome back!",
-                icon: "success"
-              });
-              // Redirect to the home page or any other page
-              this.router.navigateByUrl("/home");
-            } else {
-              // Show error alert if credentials are invalid
-              Swal.fire({
-                icon: "error",
-                title: "Invalid credentials",
-                text: "Please check your email and password.",
-              });
-            }
-          },
-          error: (error) => {
-            // Show error alert
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-              footer: '<a href="#">Why do I have this issue?</a>'
-            });
+      const { email, password } = form.value;
+      
+      this.authService.postLogin({ email, password }).subscribe({
+        next: (res: any) => {
+          // Token storage and authState update is now handled in AuthService
+          const role = this.authService.getCurrentUserRole();
+          
+          Swal.fire({
+            title: 'Login Successful',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            this.router.navigate([role === 'teacher' ? '/teacher' : '/student']);
+          });
+        },
+        error: (err) => {
+          let errorMessage = 'Login failed. Please try again.';
+          if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else if (err.status === 401) {
+            errorMessage = 'Invalid email or password';
           }
-        });
+          
+          Swal.fire({
+            title: 'Error',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      });
     } else {
-      // Show alert if the form is invalid
-      Swal.fire({
-        icon: "error",
-        title: "Form is invalid",
-        text: "Please fill in all required fields correctly.",
+      // Mark all fields as touched to show validation errors
+      Object.keys(form.controls).forEach(field => {
+        const control = form.controls[field];
+        control.markAsTouched({ onlySelf: true });
       });
     }
   }

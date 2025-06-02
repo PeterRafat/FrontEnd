@@ -9,30 +9,36 @@ import { AccountSettingsComponent } from './teacher/account-settings/account-set
 import { QuizManuallyComponent } from './teacher/quiz-manually/quiz-manually.component';
 import { RoomsComponent } from './teacher/rooms/rooms.component';
 import { OpenquizComponent } from './teacher/openquiz/openquiz.component';
-import { StudentRoomComponent } from './student/student-components/studentRoom/student-room.component';
-import { StudentQuizesComponent } from './student/student-components/studentQuizzes/student-quizes.component';
+import { authGuard } from './guards/auth.guard';
 
 
+// src/app/app.routes.ts
 export const routes: Routes = [
+    // Public routes
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+
+    // Student routes
     {
-        path: 'Student',
-        loadChildren: () => import('./student/student.routes').then(m => m.studentRoutes)
+        path: 'student',
+        loadChildren: () => import('./student/student.routes').then(m => m.studentRoutes),
+        canActivate: [authGuard],
+        data: { role: 'student' } // Requires student role
     },
-    {path:'',redirectTo:"home",pathMatch:'full'},
-    {path:"home" , component:HomeComponent},
-    {path:"login" , component:LoginComponent},
-    {path:"register" ,component:RegisterComponent},
-    {path:"aboutus" , component:AboutusComponent},
 
-    {path:"account",component:AccountSettingsComponent},
-    {path:"studentAccount",component:AccountSettingsComponent},
-    {path:"studentRoom",component:StudentRoomComponent},
-    { path: "studentQuizes", component:StudentQuizesComponent},
+    // Teacher routes
+    {
+        path: 'teacher',
+        loadChildren: () => import('./teacher/teacher.routes').then(m => m.teacherRoutes),
+        canActivate: [authGuard],
+        data: { role: 'teacher' } // Requires teacher role
+    },
 
+    // Common authenticated routes
+    { path: 'home', component: HomeComponent },
+    { path: 'aboutus', component: AboutusComponent, canActivate: [authGuard] },
 
-    {path:"quizManually" , component:QuizManuallyComponent},
-    {path:"rooms" , component:RoomsComponent},
-    {path:"openquiz" , component:OpenquizComponent},
-
-
+    // Default redirects
+    { path: '', redirectTo: 'home', pathMatch: 'full' },
+    { path: '**', redirectTo: 'home' }
 ];

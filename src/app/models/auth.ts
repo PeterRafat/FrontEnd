@@ -8,3 +8,7 @@ export interface RegisterUser {
     entollmentDate: string; // ISO 8601 string
   }
   
+  export interface loginUser{
+    email:string,
+    password:string
+  }

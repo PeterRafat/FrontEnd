@@ -1,0 +1,9 @@
+@if (!isLoggedIn) {
+  <app-navbar></app-navbar>
+} @else {
+  @if (userRole === 'teacher') {
+    <app-teacher-navbar></app-teacher-navbar>
+  } @else if (userRole === 'student') {
+    <app-student-navbar></app-student-navbar>
+  }
+}
