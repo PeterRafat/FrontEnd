@@ -1,57 +1,418 @@
-<section class="vh-100" style="background-color: #F6F4F3;">
-    <div class="container h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-lg-10">
-                <div class="card text-black p-4" style="border-radius: 15px;">
-                    <div class="card-body">
-                        <div class="text-start mb-4">
-                            <h2 class="fw-bold" style="color: #364B96;">Account Setting</h2>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col-md-4 text-center">
-                                <img src="" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;" />
-                                <div class="mt-2">
-                                    <button class="btn change-btn" style="background-color: white; color: #332588; border: 1px solid #332588;">Change</button>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <form #form="ngForm" (ngSubmit)="onSubmit(form)">
-
-                                    <div class="mb-3">
-                                        <label class="form-label" style="color: #332588;">Name</label>
-                                        <input type="text" class="form-control" name="name" [(ngModel)]="formData.name" required>
-                                        <div class="text-danger" *ngIf="form.submitted && !formData.name">Name is required</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label" style="color: #332588;">Email</label>
-                                        <input type="email" class="form-control" name="email" [(ngModel)]="formData.email" required>
-                                        <div class="text-danger" *ngIf="form.submitted && !formData.email">Email is required</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label" style="color: #332588;">Password</label>
-                                        <input type="password" class="form-control" name="password" [(ngModel)]="formData.password" required>
-                                        <div class="text-danger" *ngIf="form.submitted && !formData.password">Password is required</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label" style="color: #332588;">Confirm Password</label>
-                                        <input type="password" class="form-control" name="confirmPassword" [(ngModel)]="formData.confirmPassword" required>
-                                        <div class="text-danger" *ngIf="form.submitted && !formData.confirmPassword">Confirm Password is required</div>
-                                        <div class="text-danger" *ngIf="form.submitted && formData.password !== formData.confirmPassword">Passwords do not match</div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary" style="width: 178px;">Save</button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+<section class="py-5" style="background-color: #F6F4F3;">
+  <div class="container">
+    <div class="row d-flex justify-content-center">
+      <div class="col-lg-10">
+        <div class="card text-black p-4" style="border-radius: 15px;">
+          <div class="card-body">
+            <div class="text-start mb-4">
+              <h2 class="fw-bold" style="color: #364B96;">Account Settings</h2>
+              <p class="text-muted">Manage your profile information and account settings</p>
             </div>
-        </div>
-    </div>
+            
+            <div class="row align-items-center">
+              <!-- Profile Picture Section -->
+              <div class="col-md-4 text-center">
+                <div class="mb-3 position-relative">
+                  <!-- Error Alert -->
+                  <div *ngIf="hasPhotoError" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Failed to load profile picture
+                    <button type="button" class="btn-close" (click)="hasPhotoError = false" aria-label="Close"></button>
+                  </div>
 
+                  <!-- Profile Image Container -->
+                  <div class="profile-image-container" 
+                       style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #e9ecef; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <img 
+                      [src]="getCurrentPhotoUrl()" 
+                      class="img-fluid" 
+                      [class.error]="hasPhotoError"
+                      [class.loading]="isUploadingPhoto"
+                      alt="Profile Picture" 
+                      style="width: 100%; height: 100%; object-fit: cover;"
+                      (error)="handlePhotoError()"
+                    />
+                    
+                    <!-- Upload Progress Overlay -->
+                    <div *ngIf="isUploadingPhoto" 
+                         class="upload-progress-overlay d-flex align-items-center justify-content-center"
+                         style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: white;">
+                      <div class="text-center">
+                        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+                        <div class="small">Uploading...</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Upload Controls -->
+                  <div class="mt-4">
+                    <label for="photoUpload" 
+                           class="btn btn-outline-primary rounded-pill px-4" 
+                           [class.disabled]="isUploadingPhoto">
+                      <i class="fas fa-camera me-2"></i>
+                      {{ isUploadingPhoto ? 'Uploading...' : 'Change Photo' }}
+                    </label>
+
+                    <input 
+                      type="file" 
+                      id="photoUpload" 
+                      accept="image/*" 
+                      (change)="onPhotoSelected($event)" 
+                      style="display: none;"
+                      [disabled]="isUploadingPhoto"
+                    />
+
+                    <div class="text-muted small mt-2">
+                      <i class="fas fa-info-circle me-1"></i>
+                      JPG, PNG, or GIF (max 5MB)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Profile Information Section -->
+              <div class="col-md-8">
+                <div *ngIf="isLoading" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+
+                <div *ngIf="!isLoading && userProfile">
+                  <!-- View Mode -->
+                  <div *ngIf="!isEditingProfile && !isChangingPassword" class="profile-info">
+                    <div class="mb-4">
+                      <label class="form-label text-muted">Email Address</label>
+                      <p class="form-control-static">{{ userProfile.email }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                      <label class="form-label text-muted">First Name</label>
+                      <p class="form-control-static">{{ userProfile.firstName }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                      <label class="form-label text-muted">Last Name</label>
+                      <p class="form-control-static">{{ userProfile.lastName }}</p>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                      <button class="btn btn-primary rounded-pill px-4" (click)="isEditingProfile = true">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                      </button>
+                      <button class="btn btn-outline-primary rounded-pill px-4" (click)="isChangingPassword = true">
+                        <i class="fas fa-key me-2"></i>Change Password
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Edit Profile Mode -->
+                  <form *ngIf="isEditingProfile" #profileForm="ngForm" (ngSubmit)="updateProfile()" class="edit-form">
+                    <h3 class="form-section-header">Edit Profile Information</h3>
+                    
+                    <div class="input-group">
+                      <i class="fas fa-user"></i>
+                      <div class="w-100">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" name="firstName" 
+                               [(ngModel)]="profileFormData.firstName" required #firstName="ngModel"
+                               placeholder="Enter your first name">
+                        <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          <span *ngIf="firstName.errors?.['required']">First name is required</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="input-group">
+                      <i class="fas fa-user"></i>
+                      <div class="w-100">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="lastName" 
+                               [(ngModel)]="profileFormData.lastName" required #lastName="ngModel"
+                               placeholder="Enter your last name">
+                        <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          <span *ngIf="lastName.errors?.['required']">Last name is required</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                      <button type="submit" class="btn btn-primary rounded-pill px-4" [disabled]="profileForm.invalid || isLoading">
+                        <i class="fas fa-save me-2"></i>
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Save Changes
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="cancelEdit()">
+                        <i class="fas fa-times me-2"></i>Cancel
+                      </button>
+                    </div>
+                  </form>
+
+                  <!-- Change Password Mode -->
+                  <form *ngIf="isChangingPassword" #passwordForm="ngForm" (ngSubmit)="changePassword()" class="password-form">
+                    <h3 class="form-section-header">Change Password</h3>
+                    
+                    <div class="input-group">
+                      <i class="fas fa-lock"></i>
+                      <div class="w-100">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="currentPassword" 
+                               [(ngModel)]="passwordFormData.currentPassword" required minlength="8" #currentPassword="ngModel"
+                               placeholder="Enter your current password">
+                        <div *ngIf="currentPassword.invalid && (currentPassword.dirty || currentPassword.touched)" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          <span *ngIf="currentPassword.errors?.['required']">Current password is required</span>
+                          <span *ngIf="currentPassword.errors?.['minlength']">Password must be at least 8 characters</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="input-group">
+                      <i class="fas fa-key"></i>
+                      <div class="w-100">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="newPassword" 
+                               [(ngModel)]="passwordFormData.newPassword" required minlength="8" #newPassword="ngModel"
+                               placeholder="Enter your new password">
+                        <div *ngIf="newPassword.invalid && (newPassword.dirty || newPassword.touched)" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          <span *ngIf="newPassword.errors?.['required']">New password is required</span>
+                          <span *ngIf="newPassword.errors?.['minlength']">Password must be at least 8 characters</span>
+                        </div>
+                        <div *ngIf="passwordStrengthError() && newPassword.valid" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ passwordStrengthError() }}
+                        </div>
+                        <div class="password-strength">
+                          <div class="password-strength-bar" [ngClass]="getPasswordStrengthClass()"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="input-group">
+                      <i class="fas fa-check-circle"></i>
+                      <div class="w-100">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirmPassword" 
+                               [(ngModel)]="passwordFormData.confirmPassword" required minlength="8" #confirmPassword="ngModel"
+                               placeholder="Confirm your new password">
+                        <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          <span *ngIf="confirmPassword.errors?.['required']">Please confirm your password</span>
+                          <span *ngIf="confirmPassword.errors?.['minlength']">Password must be at least 8 characters</span>
+                        </div>
+                        <div *ngIf="passwordForm.submitted && passwordFormData.newPassword !== passwordFormData.confirmPassword" class="text-danger small">
+                          <i class="fas fa-exclamation-circle"></i>
+                          Passwords do not match
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                      <button type="submit" class="btn btn-primary rounded-pill px-4" [disabled]="passwordForm.invalid || isLoading || passwordStrengthError()">
+                        <i class="fas fa-key me-2"></i>
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Change Password
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="cancelPasswordChange()">
+                        <i class="fas fa-times me-2"></i>Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+<style>
+.profile-image-container {
+  transition: all 0.3s ease;
+}
+
+.profile-image-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.form-control {
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #364B96;
+  box-shadow: 0 0 0 0.2rem rgba(54, 75, 150, 0.15);
+}
+
+.alert {
+  border-radius: 10px;
+}
+
+.upload-progress-overlay {
+  backdrop-filter: blur(2px);
+}
+
+.btn-primary {
+  background-color: #364B96;
+  border-color: #364B96;
+}
+
+.btn-primary:hover {
+  background-color: #2c3d7a;
+  border-color: #2c3d7a;
+}
+
+.btn-outline-primary {
+  color: #364B96;
+  border-color: #364B96;
+}
+
+.btn-outline-primary:hover {
+  background-color: #364B96;
+  border-color: #364B96;
+  color: white;
+}
+
+/* New Label Styles */
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #364B96;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-label::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #364B96;
+  border-radius: 2px;
+}
+
+.form-label.text-muted {
+  color: #6c757d;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-label.text-muted::before {
+  background-color: #6c757d;
+}
+
+.form-control-static {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid #e9ecef;
+}
+
+/* Error Message Styles */
+.text-danger.small {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #dc3545;
+}
+
+.text-danger.small i {
+  font-size: 0.875rem;
+}
+
+/* Input Group Styles */
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.input-group .form-control {
+  padding-left: 2.5rem;
+}
+
+.input-group i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  z-index: 2;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  height: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.password-strength-bar.weak { background-color: #dc3545; width: 33.33%; }
+.password-strength-bar.medium { background-color: #ffc107; width: 66.66%; }
+.password-strength-bar.strong { background-color: #28a745; width: 100%; }
+
+/* Profile Info Section */
+.profile-info .form-label {
+  margin-bottom: 0.25rem;
+}
+
+.profile-info .form-control-static {
+  margin-bottom: 1.5rem;
+}
+
+/* Form Section Headers */
+.form-section-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #364B96;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .form-label {
+    font-size: 0.8rem;
+  }
+  
+  .form-control-static {
+    font-size: 1rem;
+  }
+  
+  .form-control {
+    font-size: 0.9rem;
+  }
+}
+</style>
