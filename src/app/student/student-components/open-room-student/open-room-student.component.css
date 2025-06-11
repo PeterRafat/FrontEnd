@@ -1,0 +1,16 @@
+.quiz-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quiz-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-info {
+    flex: 1;
+}
+
+.quiz-actions {
+    margin-left: 1rem;
+}

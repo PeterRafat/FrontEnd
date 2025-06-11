@@ -1,61 +1,382 @@
-import { Component } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import Swal from 'sweetalert2';
+import { AccountSettingService, ChangePasswordData, UserProfile } from '../../service/account-setting.service';
+import { JwtService } from '../../service/jwt.service';
+import { AuthServiceService } from '../../service/auth-service.service';
 
 @Component({
   selector: 'app-account-settings',
   standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './account-settings.component.html',
-  styleUrls: ['./account-settings.component.css'],
-  imports: [FormsModule]
+  styleUrls: ['./account-settings.component.css']
 })
-export class AccountSettingsComponent {
-  constructor(private http: HttpClient, private router: Router) {}
+export class AccountSettingsComponent implements OnInit {
+  userProfile: UserProfile = {
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    photoUrl: '/photo/tom.jpg'
+  };
+  
+  displayPhotoUrl: string = '/photo/tom.jpg';
+  isEditingProfile = false;
+  isChangingPassword = false;
+  isLoading = false;
+  isUploadingPhoto = false;
+  photoTimestamp = Date.now();
+  hasPhotoError = false;
+  userId: string | null = null;
+  
+  profileFormData = {
+    firstName: '',
+    lastName: ''
+  };
+  
+  passwordFormData: ChangePasswordData & { confirmPassword: string } = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
 
-    onSubmit(form: NgForm) {
-     // Check if the form is valid
-      if (form.valid) {
-        // Create a user object with only the required fields
-        const user = {
-          email: form.value.email,
-          password: form.value.password,
-          firstName: form.value.firstName,
-          lastName: form.value.lastName,
-        };
-        console.log(user);
-       // Send a POST request to the backend API
-        this.http.post('http://quizgenerator.runasp.net/Auth/register', user).subscribe({
-          next: (response: any) => {
-           // Show success alert
-            Swal.fire({
-              title: 'Registration successful!',
-              text: 'You have been successfully registered.',
-              icon: 'success',
-            });
-            // Redirect to the login page
-            this.router.navigateByUrl('/login');
-          },
-          error: (error) => {
-            // Show error alert
-            Swal.fire({
-              icon: 'error',
-              title: 'Registration failed',
-              text: error.error.message ,
-              footer: '<a href="#">Why do I have this issue?</a>',
-            });
-          },
-        });
-      } else {
-        // Show alert if the form is invalid
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Form',
-          text: 'Please fill out all required fields correctly.',
-        });
+  constructor(
+    private accountService: AccountSettingService,
+    private jwtService: JwtService,
+    private authService: AuthServiceService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeUser();
+  }
+
+  initializeUser(): void {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
       }
+
+      const decoded = this.jwtService.decodeToken(token);
+      if (!decoded) {
+        throw new Error('Invalid token format');
+      }
+
+      // Try different possible properties for user ID
+      this.userId = decoded.sub || decoded.userId || decoded.id;
+      if (!this.userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Load saved photo from localStorage first
+      const savedPhoto = this.accountService.getPhotoFromLocalStorage(this.userId);
+      if (savedPhoto) {
+        this.displayPhotoUrl = savedPhoto;
+        this.userProfile.photoUrl = savedPhoto;
+      }
+
+      this.loadUserProfile();
+    } catch (error) {
+      console.error('Error initializing user:', error);
+      Swal.fire('Error', 'Please login again to continue', 'error');
+      this.authService.logout();
     }
   }
+
+  loadUserProfile(): void {
+    if (!this.userId) {
+      console.error('No user ID available');
+      return;
+    }
+
+    this.isLoading = true;
+    this.accountService.getUserProfile(this.userId)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (profile) => {
+          try {
+            // Update the user profile with the latest data
+            this.userProfile = {
+              ...profile,
+              id: this.userId!,
+              photoUrl: this.displayPhotoUrl // Keep the current photo URL
+            };
+            
+            // Update the form data to match the latest profile
+            this.profileFormData = {
+              firstName: profile.firstName,
+              lastName: profile.lastName
+            };
+            
+            // Force change detection
+            this.cdr.detectChanges();
+            
+            this.updatePhotoTimestamp();
+          } catch (error) {
+            console.error('Error loading profile:', error);
+            this.handlePhotoError();
+          }
+        },
+        error: (err) => {
+          console.error('Error loading profile:', err);
+          Swal.fire('Error', 'Failed to load user profile. Please try again.', 'error');
+        }
+      });
+  }
+
+  onPhotoSelected(event: Event): void {
+    if (!this.userId) {
+      Swal.fire('Error', 'Please login again to continue', 'error');
+      this.authService.logout();
+      return;
+    }
+
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    // Reset error state
+    this.hasPhotoError = false;
+
+    if (!file.type.startsWith('image/')) {
+      Swal.fire('Error', 'Please select a valid image file (JPEG, PNG, etc.)', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire('Error', 'Image size should be less than 5MB', 'error');
+      return;
+    }
+
+    this.uploadPhoto(file);
+    input.value = '';
+  }
+
+  uploadPhoto(file: File): void {
+    if (!this.userId) return;
+
+    this.isUploadingPhoto = true;
+    this.accountService.uploadPhoto(this.userId, file)
+      .pipe(finalize(() => this.isUploadingPhoto = false))
+      .subscribe({
+        next: (response) => {
+          this.displayPhotoUrl = response.photoUrl;
+          this.userProfile.photoUrl = response.photoUrl;
+          this.accountService.savePhotoToLocalStorage(this.userId!, response.photoUrl);
+          this.updatePhotoTimestamp();
+          Swal.fire({
+            title: 'Success',
+            text: 'Profile photo updated successfully',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        },
+        error: (err) => {
+          console.error('Error uploading photo:', err);
+          Swal.fire('Error', 'Failed to upload photo. Please try again.', 'error');
+          this.handlePhotoError();
+        }
+      });
+  }
+
+  updatePhotoTimestamp(): void {
+    this.photoTimestamp = Date.now();
+    this.cdr.detectChanges();
+  }
+
+  getCurrentPhotoUrl(): string {
+    return `${this.displayPhotoUrl}?t=${this.photoTimestamp}`;
+  }
+
+  handlePhotoError(): void {
+    this.hasPhotoError = true;
+    this.displayPhotoUrl = '/photo/tom.jpg';
+    this.userProfile.photoUrl = '/photo/tom.jpg';
+    this.updatePhotoTimestamp();
+    this.isUploadingPhoto = false;
+    
+    // Remove the invalid photo from localStorage
+    if (this.userId) {
+      this.accountService.removePhotoFromLocalStorage(this.userId);
+    }
+  }
+
+  updateProfile(): void {
+    if (!this.userId) {
+      Swal.fire('Error', 'Please login again to continue', 'error');
+      this.authService.logout();
+      return;
+    }
+    
+    this.isLoading = true;
+    this.accountService.updateProfile(this.userId, this.profileFormData)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (updatedProfile) => {
+          // Update the local profile with the response
+          this.userProfile = {
+            ...this.userProfile,
+            ...updatedProfile,
+            firstName: this.profileFormData.firstName,
+            lastName: this.profileFormData.lastName
+          };
+          
+          // Reset form state
+          this.isEditingProfile = false;
+          
+          // Force change detection
+          this.cdr.detectChanges();
+          
+          // Show success message
+          Swal.fire({
+            title: 'Success',
+            text: 'Profile updated successfully',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            // Reload the profile to ensure we have the latest data
+            this.loadUserProfile();
+          });
+        },
+        error: (err) => {
+          console.error('Error updating profile:', err);
+          const errorMessage = err.error?.message || 'Failed to update profile. Please try again.';
+          Swal.fire('Error', errorMessage, 'error');
+        }
+      });
+  }
+
+  changePassword(): void {
+    if (!this.userId) {
+      Swal.fire('Error', 'Please login again to continue', 'error');
+      this.authService.logout();
+      return;
+    }
+
+    // Validate passwords match
+    if (this.passwordFormData.newPassword !== this.passwordFormData.confirmPassword) {
+      Swal.fire('Error', 'New password and confirm password do not match', 'error');
+      return;
+    }
+
+    // Validate password strength
+    const strengthError = this.passwordStrengthError();
+    if (strengthError) {
+      Swal.fire('Error', strengthError, 'error');
+      return;
+    }
+    
+    this.isLoading = true;
+    
+    // Remove confirmPassword before sending to API
+    const { confirmPassword, ...passwordData } = this.passwordFormData;
+    
+    this.accountService.changePassword(this.userId, passwordData)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: () => {
+          // Reset form state
+          this.isChangingPassword = false;
+          this.passwordFormData = {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          };
+          
+          // Show success message
+          Swal.fire({
+            title: 'Success',
+            text: 'Password changed successfully',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        },
+        error: (err) => {
+          console.error('Error changing password:', err);
+          const errorMessage = err.error?.message || 'Failed to change password. Please try again.';
+          Swal.fire('Error', errorMessage, 'error');
+        }
+      });
+  }
+
+  passwordStrengthError(): string | null {
+    const password = this.passwordFormData.newPassword;
+    if (!password) return null;
+
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return 'Password must contain at least one lowercase letter';
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number';
+    }
+
+    if (!/[!@#$%^&*]/.test(password)) {
+      return 'Password must contain at least one special character (!@#$%^&*)';
+    }
+
+    return null;
+  }
+
+  getPasswordStrengthClass(): string {
+    const password = this.passwordFormData.newPassword;
+    if (!password) return '';
+
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*]/.test(password);
+
+    const strength = [hasLength, hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+
+    switch (strength) {
+      case 1: return 'weak';
+      case 2: return 'fair';
+      case 3: return 'good';
+      case 4: return 'strong';
+      case 5: return 'very-strong';
+      default: return '';
+    }
+  }
+
+  cancelEdit(): void {
+    this.isEditingProfile = false;
+    this.profileFormData = {
+      firstName: this.userProfile.firstName,
+      lastName: this.userProfile.lastName
+    };
+  }
+
+  cancelPasswordChange(): void {
+    this.isChangingPassword = false;
+    this.passwordFormData = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+  }
+
+  handleImageError(): void {
+    console.log('Image error occurred, falling back to default');
+    this.displayPhotoUrl = '/photo/tom.jpg';
+    this.userProfile.photoUrl = '/photo/tom.jpg';
+    this.updatePhotoTimestamp();
+  }
+}
 

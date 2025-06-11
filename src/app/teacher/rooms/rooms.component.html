@@ -1,76 +1,100 @@
 <div class="container py-4">
     <h3 class="text-start mb-4 fw-bold" style="color: #332588;">Rooms</h3>
     
-    <div class="quiz-list">
-      <div *ngFor="let room of rooms" class="quiz-item d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm mb-3">
-        <div class="quiz-info">
-          <h5 class="fw-bold"  style="color: #332588;">{{ room.name }}</h5>
-          <p style="color: #332588;">{{ room.date }}</p>
+    <!-- Loading spinner for rooms -->
+    <div *ngIf="loading" class="text-center my-4">
+        <div class="spinner-border text-primary" role="status" style="color: #332588 !important;">
+            <span class="visually-hidden">Loading...</span>
         </div>
-        <div class="quiz-actions">
-          <button (click)="goToOpenQuiz()"  class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">Open</button>
-          <button (click)="deleteQuiz(room.id)" class="btn btn-light fw-bold " style="background-color:#F1F5FF ;color: #332588;">Delete</button>
-        </div>
-      </div>
+        <p class="mt-2" style="color: #332588;">Loading rooms...</p>
     </div>
-  
-    <div class="d-flex mt-5">
-      <div class="ms-auto">
-          <button class="btn btn-primary fw-bold me-2" data-bs-toggle="modal" data-bs-target="#createRoomModal" style="background-color: #332588;color: white;">Create Room</button>
-          <button (click)="close()" class="btn btn-primary fw-bold" style="background-color: #332588;color: white;">Close</button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="createRoomModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4">
-        <div class="modal-header border-0 justify-content-center">
-          <h5 class="modal-title text-center w-100 fw-bold" style="color: #332588;">Create Room</h5>
-          <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form #saveForm="ngForm" (ngSubmit)="onSubmit(saveForm)">
-            <div class="d-flex align-items-center gap-2 mb-4">
-              <label for="subject" class="fw-bold w-25 text-start" style="color: #332588;">Subject:</label>
-              <input type="text" 
-                     id="subject" 
-                     name="subject" 
-                     class="form-control"
-                     #subject="ngModel"
-                     ngModel
-                     required
-                     pattern="^[a-zA-Z ]{3,30}$"
-                     placeholder="Enter your Subject" />
-            </div>
-          
-            <div class="d-flex align-items-center gap-2 mb-4">
-              <label for="password" class="fw-bold w-25 text-start" style="color: #332588;">Password:</label>
-              <input type="password" 
-                     id="password" 
-                     name="password" 
-                     class="form-control"
-                     ngModel
-                     required 
-                     minlength="8" 
-                     #password="ngModel"
-                     placeholder="Enter your password" />
-            </div>
-          
-            <div class="d-flex justify-content-center mt-4">
-              <button type="submit" class="btn btn-primary w-50 fw-bold" 
-                      style="background-color: #332588;color: white;" 
-                      [disabled]="saveForm.invalid">
-                <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
-                Create
-              </button>
-            </div>
-          </form>
-          
-          
-        </div>
-      </div>
-    </div>
-  </div>
 
+    <!-- Error message -->
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+    </div>
+    
+    <!-- Rooms list -->
+    <div *ngIf="!loading" class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 style="color: #332588;">My Rooms</h2>
+            <button class="btn btn-primary fw-bold" 
+                    style="background-color: #332588;color: white;"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#createRoomModal">
+                Create Room
+            </button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4" *ngFor="let room of rooms">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #332588;">{{ room.name }}</h5>
+                        <p class="card-text">Room ID: {{ room.id }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <div class="d-flex justify-content-between">
+                            <button (click)="goToOpenQuiz(room.id)" 
+                                    class="btn btn-primary"
+                                    style="background-color: #332588;color: white;">
+                                Open
+                            </button>
+                            <button (click)="deleteRoom(room.id)" 
+                                    class="btn btn-danger">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+<div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createRoomModalLabel" style="color: #332588;">Create New Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form #roomForm="ngForm" (ngSubmit)="createRoom(roomForm.value.name)">
+                    <div class="mb-3">
+                        <label for="roomName" class="form-label">Room Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="roomName" 
+                               name="name" 
+                               ngModel 
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacherId" class="form-label">Teacher ID</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="teacherId" 
+                               name="teacherId" 
+                               [ngModel]="teacherId"
+                               disabled>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" 
+                                class="btn btn-secondary me-2" 
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="btn btn-primary"
+                                style="background-color: #332588;color: white;"
+                                [disabled]="!roomForm.form.valid">
+                            Create Room
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
   

@@ -27,3 +27,155 @@
     gap: 10px; 
     margin-top: 10px;
   }
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #332588 0%, #4a3a9c 100%) !important;
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #332588;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #332588;
+  box-shadow: 0 0 0 0.2rem rgba(51, 37, 136, 0.25);
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin-top: 0.25rem;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-primary {
+  background-color: #332588;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2a1f6e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(51, 37, 136, 0.3);
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.btn-light {
+  background-color: #f8f9fa;
+  color: #332588;
+  border: 1px solid #dee2e6;
+}
+
+.btn-light:hover {
+  background-color: #e9ecef;
+  color: #332588;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .d-flex.justify-content-end {
+    flex-direction: column;
+  }
+}
+
+/* Animation for form appearance */
+.card {
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

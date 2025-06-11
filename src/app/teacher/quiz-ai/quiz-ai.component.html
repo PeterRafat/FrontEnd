@@ -1,0 +1,140 @@
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0 fw-bold">Create Quiz with AI</h3>
+                        <button (click)="goBack()" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="quizForm" (ngSubmit)="createQuiz()">
+                        <!-- Quiz Name -->
+                        <div class="mb-3">
+                            <label for="quizName" class="form-label fw-bold" style="color: #198754;">
+                                Quiz Name <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="quizName"
+                                formControlName="quizName"
+                                [class.is-invalid]="quizForm.get('quizName')?.invalid && quizForm.get('quizName')?.touched"
+                                placeholder="Enter quiz name">
+                            <div *ngIf="quizForm.get('quizName')?.invalid && quizForm.get('quizName')?.touched" class="invalid-feedback">
+                                Quiz name is required.
+                            </div>
+                        </div>
+
+                        <!-- Quiz Description -->
+                        <div class="mb-3">
+                            <label for="quizDescription" class="form-label fw-bold" style="color: #198754;">
+                                Quiz Description <span class="text-danger">*</span>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="quizDescription"
+                                formControlName="quizDescription"
+                                [class.is-invalid]="quizForm.get('quizDescription')?.invalid && quizForm.get('quizDescription')?.touched"
+                                rows="3"
+                                placeholder="Enter quiz description"></textarea>
+                            <div *ngIf="quizForm.get('quizDescription')?.invalid && quizForm.get('quizDescription')?.touched" class="invalid-feedback">
+                                Quiz description is required.
+                            </div>
+                        </div>
+
+                        <!-- Start Time and End Time -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startTime" class="form-label fw-bold" style="color: #198754;">
+                                    Start Time <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="datetime-local" 
+                                    class="form-control" 
+                                    id="startTime"
+                                    formControlName="startTime"
+                                    [class.is-invalid]="quizForm.get('startTime')?.invalid && quizForm.get('startTime')?.touched">
+                                <div *ngIf="quizForm.get('startTime')?.invalid && quizForm.get('startTime')?.touched" class="invalid-feedback">
+                                    Start time is required.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endTime" class="form-label fw-bold" style="color: #198754;">
+                                    End Time <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="datetime-local" 
+                                    class="form-control" 
+                                    id="endTime"
+                                    formControlName="endTime"
+                                    [class.is-invalid]="quizForm.get('endTime')?.invalid && quizForm.get('endTime')?.touched">
+                                <div *ngIf="quizForm.get('endTime')?.invalid && quizForm.get('endTime')?.touched" class="invalid-feedback">
+                                    End time is required.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Duration Time and Total Questions -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="durationTime" class="form-label fw-bold" style="color: #198754;">
+                                    Duration Time (minutes) <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="durationTime"
+                                    formControlName="durationTime"
+                                    [class.is-invalid]="quizForm.get('durationTime')?.invalid && quizForm.get('durationTime')?.touched"
+                                    min="1"
+                                    placeholder="Enter duration in minutes">
+                                <div *ngIf="quizForm.get('durationTime')?.invalid && quizForm.get('durationTime')?.touched" class="invalid-feedback">
+                                    Duration time is required and must be at least 1 minute.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="totalQuestions" class="form-label fw-bold" style="color: #198754;">
+                                    Total Questions <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="totalQuestions"
+                                    formControlName="totalQuestions"
+                                    [class.is-invalid]="quizForm.get('totalQuestions')?.invalid && quizForm.get('totalQuestions')?.touched"
+                                    min="1"
+                                    placeholder="Enter total number of questions">
+                                <div *ngIf="quizForm.get('totalQuestions')?.invalid && quizForm.get('totalQuestions')?.touched" class="invalid-feedback">
+                                    Total questions is required and must be at least 1.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <button 
+                                type="button" 
+                                (click)="goBack()" 
+                                class="btn btn-secondary fw-bold">
+                                Cancel
+                            </button>
+                            <button 
+                                type="submit" 
+                                class="btn btn-success fw-bold"
+                                [disabled]="loading || quizForm.invalid"
+                                style="background-color: #198754; border-color: #198754;">
+                                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <i *ngIf="!loading" class="bi bi-plus-circle me-2"></i>
+                                {{ loading ? 'Creating...' : 'Create Quiz' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

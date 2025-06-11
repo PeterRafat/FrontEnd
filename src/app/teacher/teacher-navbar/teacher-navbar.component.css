@@ -1,3 +1,48 @@
-.btn{
-    background-color: rgba(255, 0, 0, 0.637);
+/* Navbar styling */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+}
+
+.logo-container {
+    width: 40px;
+    height: 40px;
+    margin-right: 1rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #332588 !important;
+}
+
+.nav-link.active {
+    color: #332588 !important;
+    font-weight: 600;
+}
+
+/* Account icon hover effect */
+.bi-person-circle {
+    transition: transform 0.2s ease;
+}
+
+.bi-person-circle:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .navbar-nav {
+        padding-top: 1rem;
+    }
+    
+    .d-flex.align-items-center {
+        padding: 1rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+    }
 }

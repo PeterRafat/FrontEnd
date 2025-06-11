@@ -1,63 +1,129 @@
+/* Color Variables */
+/* *{
+  color: black;
+} */
+:root {
+  --primary: #276FBF;
+  --primary-dark: #150578;
+  --secondary: #F6F4F3;
+  --light: #FFFFFF;
+  --dark: #212529;
+}
+
+/* Base Styles */
 body {
-  background: #F6F4F3;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--dark);
+  background-color: var(--secondary);
 }
 
+/* Section Padding */
 section {
-  border-radius: 10px;
-  text-align: center;
+  padding: 5rem 0;
 }
 
-h1 {
-  font-size: 2.5rem;
-}
-
+/* Hero Section */
 .hero-section {
-  color: white;
-  padding: 50px 20px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--light);
+  position: relative;
+  overflow: hidden;
+}
+.signupBtn{
+  border-color: #21252927;
+}
+.signupBtn:hover{
+  border-color: #2129219f;
 }
 
-.hero-section h1 span {
-  font-weight: bold;
-  color: #e0e8ff;
+.hero-section h1 {
+  font-weight: 800;
+  line-height: 1.2;
 }
 
-.hero-content {
-  max-width: 500px;
+.hero-section .btn-light {
+  background-color: var(--light);
+  color: var(--primary);
+  font-weight: 600;
+  /* border-color: #21252933; */
 }
 
-.hero-btn {
-  background-color: white;
-  color: #5a7ddc;
-  font-weight: bold;
-  border: none;
-  margin-top: 20px;
+.hero-section .btn-outline-light {
+  border-color: var(--light);
+  color: var(--light);
+  font-weight: 600;
 }
 
-.hero-image-container {
+.hero-section .btn-outline-light:hover {
+  background-color: var(--light);
+  color: var(--primary);
+}
+
+/* Welcome Section */
+.welcome-section {
+  background-color: var(--light);
+}
+
+.welcome-section .text-primary {
+  color: var(--primary) !important;
+}
+
+/* Features Section */
+.features-section .feature-icon {
+  width: 70px;
+  height: 70px;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.hero-image {
-  max-width: 400px;
-  height: auto;
-  border-radius: 8px;
+.features-section .hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.fc{
-  background-color: #276FBF;
+
+.features-section .hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
 }
-.fc:hover{
-  background-color: #276ebfc5;
+
+/* Create Quiz Section */
+.create-quiz-section {
+  background-color: var(--light);
 }
-.sc{
-  background-color: white;
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  position: relative;
 }
-.sc:hover{
-  background-color: rgb(247, 242, 242);
+
+.cta-section .btn-light {
+  background-color: var(--light);
+  color: var(--primary);
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
-.tc{
-  background-color: #150578;
+
+.cta-section .btn-light:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-.tc:hover{
-  background-color: #140578c8;
+.getStartedBtn{
+  border-color: #21252927;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  section {
+    padding: 3rem 0;
+  }
+  
+  .hero-section .display-4 {
+    font-size: 2.5rem;
+  }
+  
+  .welcome-section .card-body,
+  .create-quiz-section .card-body {
+    padding: 2rem;
+  }
 }

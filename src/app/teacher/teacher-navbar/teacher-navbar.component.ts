@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { AuthServiceService } from '../../service/auth-service.service';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-teacher-navbar',
   standalone: true,
-  imports: [],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './teacher-navbar.component.html',
-  styleUrl: './teacher-navbar.component.css'
+  styleUrls: ['./teacher-navbar.component.css']
 })
 export class TeacherNavbarComponent {
   constructor(private authService: AuthServiceService) {}

@@ -1,0 +1,115 @@
+<div class="container py-4">
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="text-center my-5 py-5">
+        <div class="spinner-border" role="status" style="color: #332588 !important;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3" style="color: #332588; font-size: 1.1rem;">Loading questions...</p>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ errorMessage }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Questions form -->
+    <div *ngIf="!loading" class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold mb-1" style="color: #332588;">Edit Questions</h1>
+            <button (click)="goBack()" class="btn btn-light fw-bold">
+                <i class="bi bi-arrow-left me-2"></i>Back to Quiz
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>{{ isEditMode ? 'Edit Questions' : 'Add Questions' }}</h2>
+            <div>
+                <button *ngIf="selectedQuestions.length > 0" 
+                        class="btn btn-danger me-2" 
+                        (click)="deleteSelectedQuestions()">
+                    Delete Selected ({{selectedQuestions.length}})
+                </button>
+                <!-- <button class="btn btn-secondary" (click)="goBack()">Back</button> -->
+            </div>
+        </div>
+
+        <form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+            <div formArrayName="questions">
+                <div *ngFor="let question of questionsArray.controls; let i = index" [formGroupName]="i" class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       [id]="'select-' + i"
+                                       (change)="toggleQuestionSelection(i, $event)">
+                                <label class="form-check-label" [for]="'select-' + i">
+                                    Question {{i + 1}}
+                                </label>
+                            </div>
+                            <div>
+                                <button *ngIf="question.get('id')?.value" 
+                                        type="button" 
+                                        class="btn btn-success me-2" 
+                                        (click)="saveSingleQuestion(i)">
+                                    <i class="bi bi-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-danger" (click)="removeQuestion(i)">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Text</label>
+                            <input type="text" class="form-control" formControlName="text" placeholder="Enter question text">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Type</label>
+                            <select class="form-select" formControlName="type" (change)="onQuestionTypeChange(i)">
+                                <option [ngValue]="1">Multiple Choice</option>
+                                <option [ngValue]="2">True/False</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Correct Answer</label>
+                            <input *ngIf="question.get('type')?.value === 1" type="text" class="form-control" formControlName="correctAnswer" placeholder="Enter correct answer">
+                            <select *ngIf="question.get('type')?.value === 2" class="form-select" formControlName="correctAnswer">
+                                <option value="True">True</option>
+                                <option value="False">False</option>
+                            </select>
+                        </div>
+
+                        <div formArrayName="options" *ngIf="question.get('type')?.value === 1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0" style="color: #332588;">Options</h6>
+                                <button type="button" class="btn btn-primary" (click)="addOption(i)" style="background-color: #332588;">
+                                    <i class="bi bi-plus"></i> Add Option
+                                </button>
+                            </div>
+
+                            <div *ngFor="let option of getOptionsArray(i).controls; let j = index" [formGroupName]="j" class="input-group mb-2">
+                                <input type="text" class="form-control" formControlName="text" placeholder="Enter option text">
+                                <button type="button" class="btn btn-outline-danger" (click)="removeOption(i, j)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-primary" (click)="addNewQuestion()" style="background-color: #332588;">
+                    <i class="bi bi-plus"></i> Add New Question
+                </button>
+                <button type="submit" class="btn btn-success" [disabled]="!questionForm.valid">
+                    <i class="bi bi-save"></i> Save New Questions
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

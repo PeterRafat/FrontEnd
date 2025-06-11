@@ -1,0 +1,59 @@
+<div class="quiz-container" *ngIf="!loading && !quizCompleted">
+  <div class="quiz-header">
+    <h2>{{ quiz?.title }}</h2>
+    <p class="description">{{ quiz?.description }}</p>
+    <div class="quiz-info">
+      <span class="total-questions">Total Questions: {{ quiz?.totalQuestions }}</span>
+      <span class="timer" [class.warning]="timeLeft <= 60">Time Remaining: {{ formatTime(timeLeft) }}</span>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress" [style.width.%]="(currentQuestionIndex + 1) / questions.length * 100"></div>
+    <span class="progress-text">Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</span>
+  </div>
+
+  <div class="question-container" *ngIf="questions[currentQuestionIndex]">
+    <div class="question">
+      <h3>{{ questions[currentQuestionIndex].text }}</h3>
+    </div>
+
+    <div class="options">
+      <div class="option" *ngFor="let option of questions[currentQuestionIndex].options"
+           [class.selected]="userAnswers[questions[currentQuestionIndex].id!] === option.text"
+           (click)="selectAnswer(questions[currentQuestionIndex].id!, option.text)">
+        {{ option.text }}
+      </div>
+    </div>
+  </div>
+
+  <div class="navigation-buttons">
+    <button class="nav-btn" (click)="previousQuestion()" [disabled]="currentQuestionIndex === 0">
+      Previous
+    </button>
+    <button class="nav-btn" (click)="nextQuestion()" [disabled]="currentQuestionIndex === questions.length - 1">
+      Next
+    </button>
+    <button class="complete-btn" (click)="completeQuiz()">
+      Submit
+    </button>
+  </div>
+</div>
+
+<div class="loading-container" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Loading quiz...</p>
+</div>
+
+<div class="error-container" *ngIf="errorMessage">
+  <p class="error-message">{{ errorMessage }}</p>
+</div>
+
+<div class="quiz-result" *ngIf="quizCompleted">
+  <div class="result-header">
+    <h3>Quiz Completed!</h3>
+    <p>Your Score: {{ score }}/{{ questions.length }}</p>
+    <p>Percentage: {{ ((score / questions.length) * 100) | number:'1.2-2' }}%</p>
+    <button class="btn btn-primary mt-3" (click)="router.navigate(['/student/room', roomId, 'quizzes'])">Back to Quizzes</button>
+  </div>
+</div>

@@ -1,68 +1,140 @@
-<div class="quiz-container ">
-    <h2 class="text-center fw-bold mb-4" style="color: #332588;">Quiz Details</h2>
-  
-    <form [formGroup]="quizForm" (ngSubmit)="saveQuiz()">
-        <div class="row mb-3 justify-content-center ">
-            <div class="col-md-3">
-                <label class="form-label fw-bold" style="color: #332588;">Quiz Name:</label>
-                <input type="text" class="form-control" formControlName="quizName">
-            </div>
-  
-            <div class="col-md-3 ">
-                <label class="form-label fw-bold"style="color: #332588;">Start Time:</label>
-                <input type="text" class="form-control" formControlName="startTime">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0 fw-bold">Create Manual Quiz</h3>
+                        <button (click)="goBack()" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="quizForm" (ngSubmit)="createQuiz()">
+                        <!-- Quiz Name -->
+                        <div class="mb-3">
+                            <label for="quizName" class="form-label fw-bold" style="color: #332588;">
+                                Quiz Name <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="quizName"
+                                formControlName="quizName"
+                                [class.is-invalid]="quizForm.get('quizName')?.invalid && quizForm.get('quizName')?.touched"
+                                placeholder="Enter quiz name">
+                            <div *ngIf="quizForm.get('quizName')?.invalid && quizForm.get('quizName')?.touched" class="invalid-feedback">
+                                Quiz name is required.
+                            </div>
+                        </div>
+
+                        <!-- Quiz Description -->
+                        <div class="mb-3">
+                            <label for="quizDescription" class="form-label fw-bold" style="color: #332588;">
+                                Quiz Description <span class="text-danger">*</span>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="quizDescription"
+                                formControlName="quizDescription"
+                                [class.is-invalid]="quizForm.get('quizDescription')?.invalid && quizForm.get('quizDescription')?.touched"
+                                rows="3"
+                                placeholder="Enter quiz description"></textarea>
+                            <div *ngIf="quizForm.get('quizDescription')?.invalid && quizForm.get('quizDescription')?.touched" class="invalid-feedback">
+                                Quiz description is required.
+                            </div>
+                        </div>
+
+                        <!-- Start Time and End Time -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startTime" class="form-label fw-bold" style="color: #332588;">
+                                    Start Time <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="datetime-local" 
+                                    class="form-control" 
+                                    id="startTime"
+                                    formControlName="startTime"
+                                    [class.is-invalid]="quizForm.get('startTime')?.invalid && quizForm.get('startTime')?.touched">
+                                <div *ngIf="quizForm.get('startTime')?.invalid && quizForm.get('startTime')?.touched" class="invalid-feedback">
+                                    Start time is required.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endTime" class="form-label fw-bold" style="color: #332588;">
+                                    End Time <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="datetime-local" 
+                                    class="form-control" 
+                                    id="endTime"
+                                    formControlName="endTime"
+                                    [class.is-invalid]="quizForm.get('endTime')?.invalid && quizForm.get('endTime')?.touched">
+                                <div *ngIf="quizForm.get('endTime')?.invalid && quizForm.get('endTime')?.touched" class="invalid-feedback">
+                                    End time is required.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Duration Time and Total Questions -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="durationTime" class="form-label fw-bold" style="color: #332588;">
+                                    Duration Time (minutes) <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="durationTime"
+                                    formControlName="durationTime"
+                                    [class.is-invalid]="quizForm.get('durationTime')?.invalid && quizForm.get('durationTime')?.touched"
+                                    min="1"
+                                    placeholder="Enter duration in minutes">
+                                <div *ngIf="quizForm.get('durationTime')?.invalid && quizForm.get('durationTime')?.touched" class="invalid-feedback">
+                                    Duration time is required and must be at least 1 minute.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="totalQuestions" class="form-label fw-bold" style="color: #332588;">
+                                    Total Questions <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="totalQuestions"
+                                    formControlName="totalQuestions"
+                                    [class.is-invalid]="quizForm.get('totalQuestions')?.invalid && quizForm.get('totalQuestions')?.touched"
+                                    min="1"
+                                    placeholder="Enter total number of questions">
+                                <div *ngIf="quizForm.get('totalQuestions')?.invalid && quizForm.get('totalQuestions')?.touched" class="invalid-feedback">
+                                    Total questions is required and must be at least 1.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <button 
+                                type="button" 
+                                (click)="goBack()" 
+                                class="btn btn-secondary fw-bold">
+                                Cancel
+                            </button>
+                            <button 
+                                type="submit" 
+                                class="btn btn-primary fw-bold"
+                                [disabled]="loading || quizForm.invalid"
+                                style="background-color: #332588; border-color: #332588;">
+                                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <i *ngIf="!loading" class="bi bi-plus-circle me-2"></i>
+                                {{ loading ? 'Creating...' : 'Create Quiz' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-  
-        <div class="row mb-3 justify-content-center">
-            <div class="col-md-3">
-                <label class="form-label fw-bold" style="color: #332588;">End Time:</label>
-                <input type="text" class="form-control" formControlName="endTime">
-            </div>
-  
-            <div class="col-md-3">
-                <label class="form-label fw-bold"style="color: #332588;">Duration (minutes):</label>
-                <input type="number" class="form-control" formControlName="duration">
-            </div>
-        </div>
-   
-  
-    
-        <h3 class="fw-bold"  style="color: #332588;">Questions</h3>
-    
-        <div formArrayName="questions">
-          <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="question-box">
-            
-            <label>Q{{ i + 1 }}</label>
-            <input type="text" formControlName="questionText" style="width: 400px; ">
-        
-            <div formArrayName="options">
-              <div *ngFor="let option of getOptions(question).controls; let j = index" 
-                   [formGroupName]="j" class="option-box">
-                
-                <label>{{ getLetter(j) }}.</label>
-                <input type="text" formControlName="text">
-                <input type="checkbox" formControlName="isCorrect"> 
-              </div>
-            </div>
-        
-            <div class="button-group">
-              <button type="button" (click)="editQuestion(i)" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">
-                {{ editingQuestionIndex === i ? ' Done' : ' Edit' }}
-              </button>
-              <button type="button" (click)="deleteQuestion(i)" class="btn fw-bold" style="background-color:#F1F5FF ;color: #332588;"> Delete</button>
-            </div>
-          </div>
-        </div>
-        
-        <button type="button" (click)="addQuestion()" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;">Add Question</button>
-          
-        <div class="button-group">
-          <button type="submit" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;"> Save Quiz</button>
-          <button type="button" (click)="exitQuiz()" class="btn btn-primary fw-bold me-2" style="background-color: #332588;color: white;"> Exit</button>
-        </div>
-        
-        
-        
-      </form>
     </div>
+</div>

@@ -1,114 +1,135 @@
-<section class="container py-5 text-white  mt-4" style="background: #276FBF; color: white;">
-    <div class="row align-items-center flex-column text-center">
-        <h1 class="fw-bold ">Test Your Skills and Knowledge <br> <span class="fw-bold">with Expert Quizzes</span></h1>
-        <p class="mx-auto fw-bold" style="max-width: 500px; line-height: 1.5; ">
-            QZ help students learn and engage with subjects in a fun <br>
-            and challenging way, expanding general knowledge and <br>
-            encouraging critical thinking.
-        </p>
-        <div class="d-flex justify-content-center align-items-center mt-4">
-            <!-- <button class="btn  me-3" style="background: #150578;color: white;">Sign Up For Free →</button> -->
-            <img src="/photo/undraw_Online_test_re_kyfx-removebg-preview 1.png" alt="Hero Image" class="hero-image img-fluid" />
-        </div>
-    </div>
-</section>
-
-<section class="container py-5">
-    <div class="card border rounded-4 p-5">
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container py-5">
         <div class="row align-items-center">
-            <div class="col-md-6">
-                <h2 class="fw-bold text-start">Welcome to QZ</h2>
-                <p class="text-start fw-bold">
-                    Your Website for Fun and Learning! <br>
-                    Discover a wide range of quizzes that challenge <br>
-                    your knowledge and entertain you at the same time. <br>
-                    From general knowledge and pop culture to science <br>
-                    and technology, we have something for everyone. <br>
-                    Whether you're looking to compete with friends or <br>
-                    learn something new in an interactive way, Quizat <br>
-                    has the perfect quiz for you. Start exploring now <br>
-                    and put your knowledge to the test!
+            <div class="col-lg-6 text-white">
+                <h1 class="display-4 fw-bold mb-4 text-black">Test Your Skills and Knowledge with Expert Quizzes</h1>
+                <p class="lead mb-4 text-black">
+                    QZ helps students learn and engage with subjects in a fun and challenging way,
+                    expanding general knowledge and encouraging critical thinking.
                 </p>
+                <div class="d-flex gap-3">
+                    <a routerLink="/register" class="btn signupBtn btn-light btn-lg px-4 text-black">Sign Up Free</a>
+                    <a routerLink="/aboutus" class="btn btn-outline-light btn-lg px-4 text-black">Learn More</a>
+                </div>
             </div>
-            <div class="col-md-6 text-center">
-                <img src="/photo/welcomePng.png" alt="Welcome Image" class="img-fluid rounded">
+            <div class="col-lg-6">
+                <img src="/photo/undraw_Online_test_re_kyfx-removebg-preview 1.png" alt="Online Quiz Illustration"
+                    class="img-fluid">
             </div>
         </div>
     </div>
 </section>
 
-<section class="container py-2">
-    <div class="card border rounded-4 p-5">
-        <div class="row align-items-center flex-row-reverse">
-            <div class="col-md-6">
-                <h2 class="fw-bold text-start ">Create Quiz</h2>
-                <p class="text-start fw-bold">
-                    The "Create Quiz" feature allows users to design<br>
-                    customized quizzes with ease, selecting from a <br>
-                    variety of question types.
-                    It enhances engagement<br>
-                    by offering an interactive way to test knowledge.<br>
-                    This feature is ideal for educators and learners.
-                </p>
-            </div>
-            <div class="col-md-6 text-center">
-                <img src="/photo/undraw_Online_test_re_kyfx-removebg-preview 1.png" alt="Create Quiz Image" class="img-fluid rounded">
+<!-- Welcome Section -->
+<section class="welcome-section py-5">
+    <div class="container">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-6 p-5 d-flex flex-column justify-content-center">
+                    <h2 class="fw-bold mb-4 text-primary">Welcome to QZ</h2>
+                    <p class="fs-5">
+                        Your platform for fun and learning! Discover a wide range of quizzes that challenge
+                        your knowledge and entertain you at the same time. From general knowledge to science
+                        and technology, we have something for everyone.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <img src="/photo/welcomePng.png" alt="Welcome to QZ" class="img-fluid h-100 object-fit-cover">
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="container py-5 text-center">
-    <h3 class="fw-bold text-start ">What we Offer?</h3>
-    <div class=" row justify-content-center mt-4">
-        <div class="  col-md-4 mb-3 d-flex">
-            <div class=" fc p-4 rounded shadow-sm w-100 d-flex flex-column h-100 " >
-                <span class="icon d-flex">
-                    <img src="/photo/material-symbols_picture-as-pdf.png" alt="Icon" class="img-fluid" style="max-width: 30px;">
-                </span>
-                <h4 class="fw-bold mb-3" style="color: white;">Create Quizzes from PDFs</h4>
-                <p class="fw-bold" style="color: white;">
-                    Effortlessly create quizzes by uploading a PDF.
-                    Our platform extracts questions to design a custom quiz in just minutes.
-                </p>
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold text-primary">What We Offer</h2>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-effect">
+                    <div class="card-body p-4">
+                        <div class="feature-icon bg-primary bg-opacity-10 rounded-circle mb-4">
+                            <img src="/photo/material-symbols_picture-as-pdf.png" alt="PDF Icon" class="img-fluid"
+                                width="40">
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Create Quizzes from PDFs</h3>
+                        <p class="text-muted">
+                            Effortlessly create quizzes by uploading a PDF. Our platform extracts questions
+                            to design a custom quiz in just minutes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-effect">
+                    <div class="card-body p-4">
+                        <div class="feature-icon bg-warning bg-opacity-10 rounded-circle mb-4">
+                            <img src="/photo/bi_question-circle-fill.png" alt="Questions Icon" class="img-fluid"
+                                width="40">
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Multiple Difficulty Levels</h3>
+                        <p class="text-muted">
+                            Explore quizzes designed for all skill levels - Easy for beginners, Medium for
+                            intermediate challenges, and Hard for experts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-effect">
+                    <div class="card-body p-4">
+                        <div class="feature-icon bg-info bg-opacity-10 rounded-circle mb-4">
+                            <img src="/photo/fluent-mdl2_personalize.png" alt="Personalize Icon" class="img-fluid"
+                                width="40">
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Personalized Learning</h3>
+                        <p class="text-muted">
+                            Create custom quizzes with ease. Upload your content, and our platform designs
+                            a quiz tailored to your needs.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-4 mb-3 d-flex">
-            <div class=" sc p-4 rounded shadow-sm w-100 d-flex flex-column h-100 border">
-                <span class="icon d-flex">
-                    <img src="/photo/bi_question-circle-fill.png" alt="Icon" class="img-fluid" style="max-width: 30px;">
-                </span>
-                <h4 class="fw-bold mb-3" style="color: #276FBF;">Different Level Question</h4>
-                <p class="fw-bold" style="color: #276FBF;">
-                    Explore quizzes designed for all skill levels.
-                    Easy for beginners, Medium for intermediate challenges,
-                    and Hard to push the limits of your knowledge!
-                </p>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3 d-flex">
-            <div class=" tc p-4 rounded shadow-sm w-100">
-                <span class="icon d-flex">
-                    <img src="/photo/fluent-mdl2_personalize.png" alt="Icon" class="img-fluid" style="max-width: 30px;">
-                </span>
-                <h4 class="fw-bold mb-3" style="color: white;">Personalized Quiz Creation</h4>
-                <p class="fw-bold" style="color: white;">
-                    Create custom quizzes with ease. Upload your content,
-                    and our platform designs a quiz tailored to your needs,
-                    saving you time and effort!
-                </p>
-            </div>
-        </div>
-
     </div>
 </section>
 
-<section>
-    <svg height="150" width="100%" viewBox="0 0 1200 120" preserveaspectratio="none">
-        <path d="M0,0 C50,150 330,30 500,40 C660,50 800,120 1090,40 C1300,0 1200,100 1200,30 L1200,120 L0,120 Z"
-            fill="#276FBF" />
+<!-- Create Quiz Section -->
+<section class="create-quiz-section py-5">
+    <div class="container">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="row g-0 flex-row-reverse">
+                <div class="col-md-6 p-5 d-flex flex-column justify-content-center">
+                    <h2 class="fw-bold mb-4 text-primary">Create Engaging Quizzes</h2>
+                    <p class="fs-5">
+                        The "Create Quiz" feature allows users to design customized quizzes with ease,
+                        selecting from a variety of question types. It enhances engagement by offering
+                        an interactive way to test knowledge.
+                    </p>
+                    <a routerLink="/teacher/quizManually" class="btn btn-primary mt-3 align-self-start">Try It Now</a>
+                </div>
+                <div class="col-md-6">
+                    <img src="/photo/undraw_Online_test_re_kyfx-removebg-preview 1.png" alt="Create Quiz"
+                        class="img-fluid h-100 object-fit-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    </svg>
+<!-- CTA Section -->
+<section class="cta-section py-5 text-white">
+    <div class="container text-center py-4">
+        <h2 class="display-5 fw-bold mb-4 text-black">Ready to Transform Your Learning Experience?</h2>
+        <p class="lead mb-5 text-black">Join thousands of students and educators using QZ today</p>
+        <a routerLink="/register" class="btn getStartedBtn btn-light btn-lg px-5 text-black">Get Started</a>
+    </div>
 </section>

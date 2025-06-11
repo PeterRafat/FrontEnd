@@ -1,79 +1,97 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RoomsService, Room } from '../../../service/rooms.service';
+import { JwtService } from '../../../service/jwt.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-student-room',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './student-room.component.html',
-  styleUrl: './student-room.component.css'
+  styleUrls: ['./student-room.component.css']
 })
-export class StudentRoomComponent {
-  formdata = { subject: '', password: '', ID: '' };
+export class StudentRoomComponent implements OnInit, OnDestroy {
+  rooms: Room[] = [];
+  studentId: string = '';
+  showModal = false;
+  formdata = { roomId: '', studentId: '' };
   submit = false;
   errorMessage = '';
   loading = false;
+  selectedRoomId: string = '';
+  private subscription: Subscription = new Subscription();
 
-  constructor(private router: Router, private http: HttpClient) {}
-  rooms= [
-    { id: 1, name: 'Subject', opendate: 'Sunday, 17 September 2024', closedate:'Monday, 18 September 2024'},
-    { id: 2, name: 'Subject', opendate: 'Sunday, 20 September 2024', closedate:'Tuseday, 22 September 2024' },
-    { id: 3, name: 'Subject', opendate: 'saturday, 15 October 2024', closedate:'Sunday, 1 November 2024' }
-  ];
-
-  openQuiz(id: number) {
-    console.log(`Opening quiz with ID: ${id}`);
+  constructor(
+    private jwtService: JwtService,
+    private router: Router,
+    private roomsService: RoomsService
+  ) {}
+  openJoinModal(): void {
+    this.formdata.roomId = '';
+    this.formdata.studentId = this.studentId;
+    this.submit = false;
+    this.errorMessage = '';
+    this.showModal = true;
   }
 
-  leaveQuiz(id: number) {
-    this.rooms = this.rooms.filter(room => room.id !== id);
+  closeJoinModal(): void {
+    this.showModal = false;
+    this.formdata.roomId = '';
+    this.errorMessage = '';
+    this.submit = false;
   }
 
-  Room() {
-    console.log('Joining The room..');
+  // ... (constructor remains the same)
+
+  ngOnInit(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.jwtService.decodeToken(token);
+      this.studentId = decodedToken?.sub || '';
+      if (this.studentId) {
+        this.loadRooms();
+      } else {
+        this.errorMessage = 'Could not get student ID from token';
+      }
+    } else {
+      this.errorMessage = 'No authentication token found';
+    }
   }
+
+  loadRooms(): void {
+    // Stub: implement your logic to load rooms if needed
+  }
+
+  // ... (other methods remain the same until onSubmit)
 
   onSubmit(f: NgForm): void {
-      this.submit = true;
-
-      if (f.valid) {
-        this.loading = true;
-
-        const payload = {
-          email: this.formdata.subject,
-          password: this.formdata.password,
-        };
-
-
-        this.http.post('data/login.json', payload).subscribe(
-          (response) => {
-            console.log('Login successful:', response);
-            this.loading = false;
-
-
-            this.formdata = {subject: '', ID: '', password: '' };
-            f.resetForm();
-            alert('Join room successful!');
-
-
-            this.router.navigate(['/home']).then(() => {
-              console.log('Navigated to /createquiz');
-            });
-
-          },
-          (error) => {
-            console.error('Login error:', error);
-            this.errorMessage = 'Invalid ID or password.';
-            this.loading = false;
-          }
-        );
-      } else {
-        this.errorMessage = 'Please fill out the form correctly.';
-      }
+    this.submit = true;
+    this.errorMessage = '';
+    if (f.valid) {
+      this.loading = true;
+      // Only use roomId for navigation, studentId is available in component
+      this.router.navigate(['/student/room', this.formdata.roomId, 'quizzes'], {
+        state: { studentId: this.studentId }
+      }).then((success: boolean) => {
+        this.loading = false;
+        if (!success) {
+          this.errorMessage = 'Failed to navigate to quizzes page';
+        }
+      }).catch((err: unknown) => {
+        this.loading = false;
+        this.errorMessage = 'Navigation error';
+        console.error('Navigation error:', err);
+      });
+    } else {
+      this.errorMessage = 'Please enter a valid room ID.';
     }
+  }
+
+  // ... (rest of the component remains the same)
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }
-
-
-

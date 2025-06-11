@@ -1,82 +1,171 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import {  Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RoomsService } from '../../service/rooms.service';
+import { JwtService } from '../../service/jwt.service';
+import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-rooms',
-  imports: [CommonModule,FormsModule,HttpClientModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './rooms.component.html',
-  styleUrl: './rooms.component.css'
+  styleUrls: ['./rooms.component.css']
 })
-export class RoomsComponent {
-  formdata = { subject: '', password: '' };
-  submit = false;
-  errorMessage = '';
-  loading = false; 
-  
-  constructor(private router: Router, private http: HttpClient) {}
-  rooms= [
-    { id: 1, name: 'Subject', date: '17 Sep 2024' },
-    { id: 2, name: 'Subject', date: '20 Sep 2024' },
-    { id: 3, name: 'Subject', date: '15 Oct 2024' }
-  ];
+export class RoomsComponent implements OnInit, OnDestroy {
+  rooms: any[] = [];
+  loading: boolean = true;
+  errorMessage: string = '';
+  teacherId: string = '';
+  private subscription: Subscription = new Subscription();
 
-  goToOpenQuiz(): void {
-    this.router.navigate(['/openquiz']);
-  }
-  
+  constructor(
+    private router: Router,
+    private roomsService: RoomsService,
+    public jwtService: JwtService,
+    private route: ActivatedRoute
+  ) {}
 
-  deleteQuiz(id: number) {
-    this.rooms = this.rooms.filter(room => room.id !== id);
-    console.log(`Deleted quiz with ID: ${id}`);
+  ngOnInit() {
+    this.validateTokenAndLoadData();
   }
 
-  createRoom() {
-    console.log('Creating a new room...');
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
-  close() : void {
-    this.router.navigate(['/quizManually']);
-  
-  }
-
-  onSubmit(form: NgForm) {
-    if (form.valid) {
-      const room = {
-        subject: form.value.subject,
-        password: form.value.password
-      };
-  
-      console.log(room);
-  
-      this.http.post('http://quizgenerator.runasp.net/Room/create', room).subscribe({
-        next: (response: any) => {
-          Swal.fire({
-            title: 'Room created!',
-            text: 'Your room has been created successfully.',
-            icon: 'success',
-          });
-          this.router.navigateByUrl('/rooms'); 
-        },
-        error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Room creation failed',
-            text: error.error.message || 'Something went wrong.',
-            footer: '<a href="#">Why do I have this issue?</a>',
-          });
-        },
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Form',
-        text: 'Please fill out all required fields correctly.',
-      });
+  private validateTokenAndLoadData() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.handleAuthError('No authentication token found');
+      return;
     }
+
+    if (this.jwtService.isTokenExpired(token)) {
+      this.handleAuthError('Your session has expired. Please login again.');
+      return;
+    }
+
+    const decodedToken = this.jwtService.decodeToken(token);
+    if (!decodedToken) {
+      this.handleAuthError('Failed to decode token');
+      return;
+    }
+
+    this.teacherId = decodedToken.id || decodedToken.sub || decodedToken.userId;
+    if (!this.teacherId) {
+      this.handleAuthError('No teacher ID found in token');
+      return;
+    }
+
+    this.loadRooms();
+    
+    // Subscribe to room updates
+    this.subscription.add(
+      this.roomsService.rooms$.subscribe(rooms => {
+        this.rooms = rooms;
+      })
+    );
   }
-  
+
+  private handleAuthError(message: string) {
+    console.error('Authentication error:', message);
+    Swal.fire({
+      icon: 'error',
+      title: 'Authentication Error',
+      text: message,
+      confirmButtonColor: '#332588'
+    }).then(() => {
+      localStorage.removeItem('token');
+      this.router.navigate(['/login']);
+    });
+  }
+
+  private loadRooms() {
+    this.loading = true;
+    this.roomsService.getTeacherRooms(this.teacherId).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading rooms:', error);
+        this.errorMessage = 'Failed to load rooms. Please try again.';
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.errorMessage,
+          confirmButtonColor: '#332588'
+        });
+      }
+    });
+  }
+
+  createRoom(name: string) {
+    this.loading = true;
+    this.roomsService.createRoom(name, this.teacherId).subscribe({
+      next: (res:any) => {
+        this.loading = false;
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Room created successfully!',
+          confirmButtonColor: '#332588'
+        });
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error('Error creating room:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message || 'Failed to create room. Please try again.',
+          confirmButtonColor: '#332588'
+        });
+      }
+    });
+  }
+
+  deleteRoom(roomId: string) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#332588',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.roomsService.deleteRoom(roomId, this.teacherId).subscribe({
+          next: () => {
+            this.loading = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Room has been deleted.',
+              confirmButtonColor: '#332588'
+            });
+          },
+          error: (error) => {
+            this.loading = false;
+            console.error('Error deleting room:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error.message || 'Failed to delete room. Please try again.',
+              confirmButtonColor: '#332588'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  goToOpenQuiz(roomId: string) {
+    this.router.navigate(['/teacher/openquiz', roomId]);
+  }
 }
