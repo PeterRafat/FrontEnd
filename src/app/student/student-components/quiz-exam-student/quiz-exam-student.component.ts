@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomsService, Quiz, Question } from '../../../service/rooms.service';
+import { RoomsService, Quiz, Question, QuizResult } from '../../../service/rooms.service';
 import { Subscription, interval } from 'rxjs';
+import { JwtService } from '../../../service/jwt.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-quiz-exam-student',
@@ -24,14 +26,21 @@ export class QuizExamStudentComponent implements OnInit, OnDestroy {
   score: number = 0;
   loading: boolean = true;
   errorMessage: string = '';
+  studentId: string = '';
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
-    private roomsService: RoomsService
+    private roomsService: RoomsService,
+    private jwtService: JwtService
   ) {}
 
   ngOnInit() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.jwtService.decodeToken(token);
+      this.studentId = decodedToken?.sub || '';
+    }
     this.quizId = Number(this.route.snapshot.params['quizId']);
     this.roomId = this.route.snapshot.params['roomId'];
     if (!this.quizId || !this.roomId) {
@@ -127,7 +136,35 @@ export class QuizExamStudentComponent implements OnInit, OnDestroy {
       }
     });
     this.quizCompleted = true;
-    // TODO: Optionally, send result to backend for persistence
+
+    // Submit result to backend
+    const result: QuizResult = {
+      score: this.score,
+      studentId: this.studentId,
+      quizId: this.quizId
+    };
+
+    this.roomsService.submitQuizResult(result).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Quiz Completed!',
+          text: `Your score: ${this.score}/${this.questions.length}`,
+          confirmButtonColor: '#332588'
+        }).then(() => {
+          this.router.navigate(['/student/room', this.roomId, 'quizzes']);
+        });
+      },
+      error: (error) => {
+        console.error('Error submitting quiz result:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to submit quiz result. Please try again.',
+          confirmButtonColor: '#332588'
+        });
+      }
+    });
   }
 
   formatTime(seconds: number): string {

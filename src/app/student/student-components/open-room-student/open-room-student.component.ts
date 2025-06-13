@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomsService, Quiz } from '../../../service/rooms.service';
+import { RoomsService, Quiz, QuizResult } from '../../../service/rooms.service';
 import { JwtService } from '../../../service/jwt.service';
 
 @Component({
@@ -12,20 +12,12 @@ import { JwtService } from '../../../service/jwt.service';
   styleUrls: ['./open-room-student.component.css']
 })
 export class OpenRoomStudentComponent implements OnInit {
-  navigateToQuiz(quizId: number): void {
-    // Navigate to the quiz exam page for the student
-    this.router.navigate([`/student/room/${this.roomId}/quiz/${quizId}/exam`]);
-  }
-
-  goBack(): void {
-    // Navigate back to the student room list
-    this.router.navigate(['/student/studentRoom']);
-  }
   roomId: string = '';
   quizzes: Quiz[] = [];
+  quizResults: { [key: number]: QuizResult } = {};
   loading = false;
   errorMessage = '';
-  studentId: string = ''; // Keep studentId available
+  studentId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -34,52 +26,30 @@ export class OpenRoomStudentComponent implements OnInit {
     private jwtService: JwtService
   ) {}
 
-  ngOnInit(): void {
-    // Try to get studentId from token first
+  ngOnInit() {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = this.jwtService.decodeToken(token);
       this.studentId = decodedToken?.sub || '';
-      // Debug: log the decoded token and role
-      console.log('Decoded token:', decodedToken);
-      console.log('Role in token:', decodedToken?.Role);
     }
-
-    // Fallback: get studentId from navigation state if not found in token
-    if (!this.studentId) {
-      const nav = this.router.getCurrentNavigation();
-      if (nav && nav.extras && nav.extras.state && nav.extras.state['studentId']) {
-        this.studentId = nav.extras.state['studentId'];
-        console.log('StudentId from navigation state:', this.studentId);
-      }
+    this.roomId = this.route.snapshot.params['roomId'];
+    if (this.roomId) {
+      this.loadQuizzes();
     }
-
-    // Get roomId from route
-    this.route.paramMap.subscribe(params => {
-      this.roomId = params.get('roomId') || '';
-      if (this.roomId) {
-        this.loadQuizzes();
-      } else {
-        this.errorMessage = 'No room ID provided';
-      }
-    });
-
-    // Alternative: get studentId from navigation state
-    // this.studentId = this.router.getCurrentNavigation()?.extras.state?.['studentId'] || '';
   }
 
   loadQuizzes(): void {
     this.loading = true;
     this.errorMessage = '';
     
-    // Only send roomId to the API
     this.roomsService.getQuizzesByRoom(this.roomId).subscribe({
       next: (quizzes) => {
         this.quizzes = quizzes;
+        // Load results for each quiz
+        quizzes.forEach(quiz => {
+          this.loadQuizResult(quiz.id);
+        });
         this.loading = false;
-        
-        // StudentId is available here if needed for other purposes
-        console.log('Student ID:', this.studentId); 
       },
       error: (error) => {
         this.errorMessage = 'Failed to load quizzes for this room';
@@ -89,5 +59,54 @@ export class OpenRoomStudentComponent implements OnInit {
     });
   }
 
-  // ... (rest of the component remains the same)
+  loadQuizResult(quizId: number): void {
+    this.roomsService.getQuizResult(quizId, this.studentId).subscribe({
+      next: (result) => {
+        if (result && result.score !== undefined) {
+          this.quizResults[quizId] = result;
+        }
+      },
+      error: (error) => {
+        // Only log the error, don't show it to the user
+        // This is expected for quizzes that haven't been taken yet
+        console.log(`No result found for quiz ${quizId}`);
+      }
+    });
+  }
+
+  navigateToQuiz(quizId: number): void {
+    // Only allow navigation if the quiz hasn't been completed
+    if (!this.quizResults[quizId]) {
+      this.router.navigate([`/student/room/${this.roomId}/quiz/${quizId}/exam`]);
+    }
+  }
+
+  isQuizCompleted(quizId: number): boolean {
+    return !!this.quizResults[quizId] && this.quizResults[quizId].score !== undefined;
+  }
+
+  getCompletedQuizzesCount(): number {
+    return Object.values(this.quizResults).filter(result => result.score !== undefined).length;
+  }
+
+  getPendingQuizzesCount(): number {
+    return this.quizzes.length - this.getCompletedQuizzesCount();
+  }
+
+  getAverageScore(): number {
+    const completedQuizzes = Object.values(this.quizResults).filter(result => result.score !== undefined);
+    if (completedQuizzes.length === 0) return 0;
+
+    const totalScore = completedQuizzes.reduce((sum, result) => {
+      const quiz = this.quizzes.find(q => q.id === result.quizId);
+      if (!quiz) return sum;
+      return sum + (result.score / quiz.totalQuestions) * 100;
+    }, 0);
+
+    return Math.round(totalScore / completedQuizzes.length);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/student/studentRoom']);
+  }
 }

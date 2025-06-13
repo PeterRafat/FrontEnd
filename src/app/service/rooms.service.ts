@@ -1,8 +1,7 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, tap, switchMap, take, filter } from 'rxjs/operators';
+import { catchError, tap, switchMap, take, filter, map } from 'rxjs/operators';
 import { timer } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Router } from '@angular/router';
@@ -38,6 +37,24 @@ export interface Question {
 
 export interface QuestionOption {
   text: string;
+}
+
+export interface QuizResult {
+  score: number;
+  studentId: string;
+  quizId: number;
+  completedAt?: string;
+}
+
+export interface QuizResultResponse {
+  value: QuizResult;
+  isSuccess: boolean;
+  isFailure: boolean;
+  error: {
+    code: string;
+    description: string;
+    statusCode: number | null;
+  };
 }
 
 @Injectable({
@@ -188,7 +205,7 @@ export class RoomsService {
         timer(0, 1000).pipe(
           take(10), // up to 10 tries (10 seconds)
           switchMap(() => this.getQuestionsByQuiz(quizId)),
-          filter((questions: Question[]) => Array.isArray(questions) && questions.length > 0),
+          filter((questions: Question[]) => Array.isArray(questions)), // remove length > 0 to emit even if empty
           take(1)
         )
       ),
@@ -228,5 +245,28 @@ export class RoomsService {
     ).pipe(
       catchError(this.handleError)
     );
+  }
+
+  submitQuizResult(result: QuizResult): Observable<any> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post<any>(
+      `${environment.baseurl}/api/Result`,
+      {
+        score: result.score,
+        studentId: result.studentId,
+        quizId: result.quizId
+      },
+      { headers }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getQuizResult(quizId: number, studentId: string): Observable<QuizResult> {
+    return this.http.get<QuizResultResponse>(`${environment.baseurl}/api/Result/${quizId}/${studentId}`)
+      .pipe(
+        map(response => response.value),
+        catchError(this.handleError)
+      );
   }
 }

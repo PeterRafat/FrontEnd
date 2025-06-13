@@ -1,54 +1,215 @@
-
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-start fw-bold mb-0" style="color: #332588;">Quizzes in Room</h3>
-        <button class="btn btn-light fw-bold" (click)="goBack()">
-            <i class="bi bi-arrow-left me-2"></i>Back to Room
-        </button>
-    </div>
-
-    <div *ngIf="loading" class="text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <!-- Header Section -->
+    <div class="header-section mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="text-start fw-bold mb-2" style="color: #332588;">Course Quizzes</h3>
+                <p class="text-muted mb-0">Test your knowledge and track your progress</p>
+            </div>
+            <button (click)="goBack()" class="btn btn-primary fw-bold px-4" style="background-color: #332588; color: white;">
+                <i class="bi bi-arrow-left me-2"></i>Back to Courses
+            </button>
         </div>
     </div>
 
-    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
-        {{ errorMessage }}
-    </div>
-
-    <div class="quiz-list">
-        <div *ngFor="let quiz of quizzes" class="quiz-item d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm mb-3">
-            <div class="quiz-info">
-                <h5 class="fw-bold" style="color: #332588;">{{ quiz.title }}</h5>
-                <p class="mb-1">{{ quiz.description }}</p>
-                <small class="text-muted">Duration: {{ quiz.duration }} minutes</small>
-                <div class="mt-2">
-                    <div class="quiz-meta d-flex align-items-center mb-1">
-                        <i class="bi bi-calendar-event me-2"></i>
-                        <span>
-                            <small>Starts:</small>
-                            <span class="fw-bold">{{ quiz.startAt | date:'MMM d, y, HH:mm':'GMT+3' }}</span>
-                        </span>
-                    </div>
-                    <div class="quiz-meta d-flex align-items-center">
-                        <i class="bi bi-calendar-x me-2"></i>
-                        <span>
-                            <small>Ends:</small>
-                            <span class="fw-bold">{{ quiz.endAt | date:'MMM d, y, HH:mm':'GMT+3' }}</span>
-                        </span>
+    <!-- Progress Overview -->
+    <div class="progress-overview mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="progress-card bg-white p-3 rounded shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="progress-icon me-3">
+                            <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Completed Quizzes</h6>
+                            <h4 class="mb-0">{{ getCompletedQuizzesCount() }}</h4>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="quiz-actions">
-                <button (click)="navigateToQuiz(quiz.id)" class="btn btn-primary fw-bold" style="background-color: #332588;color: white;">
-                    Start Quiz
+            <div class="col-md-4">
+                <div class="progress-card bg-white p-3 rounded shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="progress-icon me-3">
+                            <i class="bi bi-clock-fill text-warning fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Pending Quizzes</h6>
+                            <h4 class="mb-0">{{ getPendingQuizzesCount() }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-card bg-white p-3 rounded shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="progress-icon me-3">
+                            <i class="bi bi-graph-up text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Average Score</h6>
+                            <h4 class="mb-0">{{ getAverageScore() }}%</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz List -->
+    <div class="quiz-list">
+        <div *ngFor="let quiz of quizzes" class="quiz-item d-flex justify-content-between align-items-center bg-white p-4 rounded shadow-sm mb-3">
+            <div class="quiz-info">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="quiz-icon me-3">
+                        <i class="bi bi-journal-text fs-4" style="color: #332588;"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1" style="color: #332588;">{{ quiz.title }}</h5>
+                        <div class="quiz-meta text-muted small">
+                            <span class="me-3"><i class="bi bi-clock me-1"></i>{{ quiz.duration }} min</span>
+                            <span><i class="bi bi-list-check me-1"></i>{{ quiz.totalQuestions }} questions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quiz-details">
+                    <div class="quiz-timeline mb-2">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-calendar-event me-2 text-primary"></i>
+                            <span class="text-muted small">Starts: </span>
+                            <span class="ms-1 fw-medium">{{ quiz.startAt | date:'MMM d, y, HH:mm':'GMT+3' }}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar-x me-2 text-danger"></i>
+                            <span class="text-muted small">Ends: </span>
+                            <span class="ms-1 fw-medium">{{ quiz.endAt | date:'MMM d, y, HH:mm':'GMT+3' }}</span>
+                        </div>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div *ngIf="quizResults[quiz.id]" 
+                             class="progress-bar" 
+                             [style.width.%]="(quizResults[quiz.id].score / quiz.totalQuestions) * 100"
+                             role="progressbar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-actions d-flex flex-column align-items-center gap-3">
+                <div *ngIf="quizResults[quiz.id]" class="completed-status text-center">
+                    <div class="score-display mb-2">
+                        <span class="score-badge">
+                            {{ quizResults[quiz.id].score }}/{{ quiz.totalQuestions }}
+                        </span>
+                    </div>
+                    <div class="completion-date text-muted small">
+                        <i class="bi bi-calendar-check me-1"></i>
+                        {{ quizResults[quiz.id]?.completedAt | date:'medium' }}
+                    </div>
+                </div>
+                <button *ngIf="!quizResults[quiz.id]" 
+                        (click)="navigateToQuiz(quiz.id)" 
+                        class="btn btn-primary fw-bold px-4" 
+                        style="background-color: #332588; color: white;">
+                    <i class="bi bi-play-fill me-2"></i>Start Quiz
                 </button>
             </div>
         </div>
     </div>
 
-    <div *ngIf="quizzes.length === 0 && !loading" class="alert alert-info mt-3">
-        No quizzes available in this room.
+    <!-- Loading and Error States -->
+    <div *ngIf="loading" class="text-center mt-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ errorMessage }}
     </div>
 </div>
+
+<style>
+.header-section {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+}
+
+.progress-card {
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+.progress-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.quiz-item {
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+.quiz-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.score-display {
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid #332588;
+}
+
+.score-badge {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #332588;
+}
+
+.completion-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.quiz-details {
+    font-size: 0.95rem;
+}
+
+.quiz-details i {
+    color: #332588;
+}
+
+.progress-bar {
+    background-color: #332588;
+}
+
+.quiz-meta {
+    font-size: 0.85rem;
+}
+
+.quiz-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.quiz-timeline {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.quiz-timeline i {
+    width: 20px;
+    text-align: center;
+}
+</style>

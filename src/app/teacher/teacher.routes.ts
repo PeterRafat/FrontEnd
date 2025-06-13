@@ -12,6 +12,7 @@ export const teacherRoutes: Routes = [
     {
         path: '',
         canActivate: [authGuard],
+        data: { role: 'teacher' },
         children: [
             { path: '', redirectTo: "home", pathMatch: 'full' },
             { path: 'home', component: HomeComponent },

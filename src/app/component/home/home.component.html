@@ -9,7 +9,7 @@
                     expanding general knowledge and encouraging critical thinking.
                 </p>
                 <div class="d-flex gap-3">
-                    <a routerLink="/register" class="btn signupBtn btn-light btn-lg px-4 text-black">Sign Up Free</a>
+                    <a *ngIf="!isLoggedIn" routerLink="/register" class="btn signupBtn btn-light btn-lg px-4 text-black">Sign Up Free</a>
                     <a routerLink="/aboutus" class="btn btn-outline-light btn-lg px-4 text-black">Learn More</a>
                 </div>
             </div>
@@ -130,6 +130,6 @@
     <div class="container text-center py-4">
         <h2 class="display-5 fw-bold mb-4 text-black">Ready to Transform Your Learning Experience?</h2>
         <p class="lead mb-5 text-black">Join thousands of students and educators using QZ today</p>
-        <a routerLink="/register" class="btn getStartedBtn btn-light btn-lg px-5 text-black">Get Started</a>
+        <a *ngIf="!isLoggedIn" routerLink="/register" class="btn getStartedBtn btn-light btn-lg px-5 text-black">Get Started</a>
     </div>
 </section>

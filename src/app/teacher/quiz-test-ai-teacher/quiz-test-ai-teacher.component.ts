@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { RoomsService, Question } from '../../service/rooms.service';
@@ -43,7 +43,8 @@ export class QuizTestAiTeacherComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private roomsService: RoomsService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.questionForm = this.fb.group({
       questions: this.fb.array([])
@@ -83,12 +84,13 @@ export class QuizTestAiTeacherComponent implements OnInit {
       return;
     }
     this.uploading = true;
-    this.roomsService.generateQuestionsFromPDF(this.quizId, this.pdfFile).subscribe({
+    this.roomsService.generateQuestionsFromPDFAndFetch(this.quizId, this.pdfFile).subscribe({
       next: (questions: any) => {
         this.uploading = false;
         Swal.fire('Success', 'Questions generated from PDF!', 'success');
         this.questions = questions;
         this.initializeForm();
+        this.cdr.markForCheck(); // Ensure UI updates
       },
       error: (err: any) => {
         this.uploading = false;
