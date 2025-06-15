@@ -80,7 +80,7 @@ export class QuizExamStudentComponent implements OnInit, OnDestroy {
   private loadQuestions() {
     this.roomsService.getQuestionsByQuiz(this.quizId).subscribe({
       next: (questions) => {
-        this.questions = questions;
+        this.questions = questions.slice(0, this.quiz?.totalQuestions || 10);
         this.loading = false;
       },
       error: () => {

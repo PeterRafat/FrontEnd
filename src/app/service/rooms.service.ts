@@ -33,6 +33,7 @@ export interface Question {
   correctAnswer: string;
   quizId: number;
   options: QuestionOption[];
+  explanation?: string;
 }
 
 export interface QuestionOption {
@@ -267,6 +268,75 @@ export class RoomsService {
       .pipe(
         map(response => response.value),
         catchError(this.handleError)
+      );
+  }
+
+  // Student: Upload PDF and generate questions for a quiz
+  generateQuestionsForStudent(quizId: number, pdfFile: File): Observable<{questions: Question[], message: string}> {
+    if (!quizId || quizId <= 0) {
+      console.error('Invalid quizId:', quizId);
+      return throwError(() => new Error('Invalid quizId'));
+    }
+
+    if (!pdfFile || !(pdfFile instanceof File) || pdfFile.size === 0) {
+      console.error('Invalid file:', pdfFile);
+      return throwError(() => new Error('Invalid file'));
+    }
+
+    const formData = new FormData();
+    formData.append('pdfFile', pdfFile); // Only use 'pdfFile'
+
+    console.log('Sending request:', {
+      url: `${environment.baseurl}/api/QuizGeneration/generate-for-student/${quizId}`,
+      fileInfo: {
+        name: pdfFile.name,
+        type: pdfFile.type,
+        size: pdfFile.size
+      }
+    });
+
+    return this.http.post<{questions: Question[], message: string}>(
+      `${environment.baseurl}/api/QuizGeneration/generate-for-student/${quizId}`,
+      formData
+    ).pipe(
+      tap(response => {
+        console.log('PDF upload response:', response);
+      }),
+      catchError(error => {
+        let backendMsg = '';
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            backendMsg = error.error;
+          } else if (typeof error.error === 'object') {
+            backendMsg = JSON.stringify(error.error);
+          }
+        }
+        console.error('PDF upload error:', {
+          status: error.status,
+          statusText: error.statusText,
+          backendMsg,
+          message: error.message
+        });
+        if (error.status === 400) {
+          return throwError(() => new Error(`Bad Request: ${backendMsg || error.message}`));
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Student: Get generated questions for a quiz
+  getStudentGeneratedQuestions(quizId: number): Observable<Question[]> {
+    if (!quizId || quizId <= 0) {
+      return throwError(() => new Error('Invalid quizId'));
+    }
+    return this.http.get<Question[]>(`${environment.baseurl}/api/QuizGeneration/student-generated-questions/${quizId}`)
+      .pipe(
+        tap(response => console.log('Get questions response:', response)),
+        catchError(error => {
+          console.error('Get questions error:', error);
+          return throwError(() => error);
+        })
       );
   }
 }

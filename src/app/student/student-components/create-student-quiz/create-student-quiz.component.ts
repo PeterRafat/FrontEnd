@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IquizStudentDetails } from '../../../models/iquiz-student-details';
-
-export interface FilePreview {
-  name: string;
-  url: string; // URL for preview (e.g., PDF icon or thumbnail)
-}
+import { Router } from '@angular/router';
+import { RoomsService, Quiz } from '../../../service/rooms.service';
+import { JwtService } from '../../../service/jwt.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-student-quiz',
@@ -15,77 +13,81 @@ export interface FilePreview {
   templateUrl: './create-student-quiz.component.html',
   styleUrls: ['./create-student-quiz.component.css']
 })
-export class CreateStudentQuizComponent {
-  // Define the quiz object using the Quiz interface
-  quiz: IquizStudentDetails = {
-    quizName: '',
-    startTime: '',
-    endTime: '',
-    difficultyLevel: '',
-    duration: null,
-    files: []
-  };
+export class CreateStudentQuizComponent implements OnInit {
+  quizzes: Quiz[] = [];
+  loading = false;
+  errorMessage = '';
+  defaultRoomId = 'fb13d1e7-e9af-4704-8544-e01cc0140d6c';
+  quizResults: { [quizId: number]: any } = {};
+  studentId: string = '';
 
-  previewFiles: FilePreview[] = []; // Store file previews
+  constructor(
+    private roomsService: RoomsService,
+    private router: Router,
+    private jwtService: JwtService
+  ) {}
 
-  // Handle file selection
-  onFileSelected(event: any): void {
-    const files = event.target.files;
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type === 'application/pdf') { // Only allow PDF files
-          this.quiz.files.push(files[i]);
-          this.previewFiles.push({
-            name: files[i].name,
-            url: '/photo/pdf.png' // Use a PDF icon or thumbnail
+  ngOnInit() {
+    // Extract studentId from JWT
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = this.jwtService.decodeToken(token);
+      this.studentId = decoded?.nameid || decoded?.sub || '';
+    }
+    this.loadQuizzes();
+  }
+
+  loadQuizzes() {
+    this.loading = true;
+    this.roomsService.getQuizzesByRoom(this.defaultRoomId).subscribe({
+      next: (quizzes: any) => {
+        this.quizzes = quizzes;
+        this.loading = false;
+        // Fetch results for each quiz
+        this.quizzes.forEach(q => {
+          this.roomsService.getQuizResult(q.id, this.studentId).subscribe(result => {
+            this.quizResults[q.id] = result;
           });
-        } else {
-          alert('Only PDF files are allowed.');
-        }
+        });
+      },
+      error: (error: any) => {
+        this.errorMessage = 'Failed to load quizzes';
+        this.loading = false;
+        console.error('Error loading quizzes:', error);
       }
-    }
+    });
   }
 
-  // Remove a file
-  removeFile(index: number): void {
-    this.quiz.files.splice(index, 1);
-    this.previewFiles.splice(index, 1);
+  navigateToCreateQuizWithAI() {
+    this.router.navigate(['/student/quiz-ai-student']);
   }
 
-  // Handle drag and drop
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
+  navigateToStudentQuizAIUpload(quizId: number) {
+    this.router.navigate(['/student/add-question', quizId]);
   }
 
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (event.dataTransfer && event.dataTransfer.files) {
-      const files = event.dataTransfer.files;
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type === 'application/pdf') { // Only allow PDF files
-          this.quiz.files.push(files[i]);
-          this.previewFiles.push({
-            name: files[i].name,
-            url: '/photo/pdf.png' // Use a PDF icon or thumbnail
-          });
-        } else {
-          alert('Only PDF files are allowed.');
-        }
+  deleteQuiz(quizId: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this quiz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.roomsService.deleteQuizFromRoom(quizId, this.defaultRoomId).subscribe({
+          next: () => {
+            this.quizzes = this.quizzes.filter(q => q.id !== quizId);
+            Swal.fire('Deleted!', 'Quiz has been deleted.', 'success');
+          },
+          error: (error: any) => {
+            Swal.fire('Error!', 'Failed to delete quiz.', 'error');
+            console.error('Error deleting quiz:', error);
+          }
+        });
       }
-    }
-  }
-
-  // Handle form submission
-  onSubmit(form: any) {
-    if (form.valid) {
-      console.log('Form Submitted!', this.quiz);
-      console.log('Selected Files:', this.quiz.files);
-      // Add your logic to handle the form data (e.g., send to an API)
-    } else {
-      console.log('Form is invalid');
-    }
+    });
   }
 }

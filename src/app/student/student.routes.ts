@@ -3,11 +3,11 @@ import { CreateStudentQuizComponent } from './student-components/create-student-
 import { authGuard } from '../guards/auth.guard';
 import { AccountSettingsComponent } from './student-components/account-settings-st/account-settings.component';
 import { StudentRoomComponent } from './student-components/studentRoom/student-room.component';
-import { StudentQuizesComponent } from './student-components/studentQuizzes/student-quizes.component';
 import { HomeComponent } from '../component/home/home.component';
 import { OpenRoomStudentComponent } from './student-components/open-room-student/open-room-student.component';
-
 import { QuizExamStudentComponent } from './student-components/quiz-exam-student/quiz-exam-student.component';
+import { QuizAiStudentComponent } from './student-components/quiz-ai-student/quiz-ai-student.component';
+import { AddQuestionComponent } from './student-components/add-question/add-question.component';
 
 export const studentRoutes: Routes = [
     {path:'',redirectTo:"home",pathMatch:'full'},
@@ -15,7 +15,6 @@ export const studentRoutes: Routes = [
     { path: 'createStudentQuiz', component: CreateStudentQuizComponent },
     { path: "studentAccount", component: AccountSettingsComponent },
     { path: "studentRoom", component: StudentRoomComponent },
-    { path: "studentQuizes", component: StudentQuizesComponent },
     { 
         path: "room/:roomId/quizzes", 
         component: OpenRoomStudentComponent,
@@ -27,5 +26,12 @@ export const studentRoutes: Routes = [
         component: QuizExamStudentComponent,
         canActivate: [authGuard],
         data: { role: 'student' }
-    }
+    },
+    {
+        path: 'quiz-ai-student',
+        component: QuizAiStudentComponent,
+        canActivate: [authGuard],
+        data: { role: 'student' }
+    },
+    { path: 'add-question/:quizId', component: AddQuestionComponent }
 ];
